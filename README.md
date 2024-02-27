@@ -14,4 +14,4 @@ Subfolders:
     This is also where data will be created in the end, as students as professors input here.
 
     [First deployed version here](https://danielbprt.pythonanywhere.com/) # Edit: this seems to not work as of 27.02.
-    In the spirif of open source, this current version is basically stolen from[this webiste](https://www.askpython.com/python-modules/flask/flask-forms)
+    In the spirit of open source, this current version is basically stolen from[this webiste](https://www.askpython.com/python-modules/flask/flask-forms)
