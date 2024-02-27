@@ -6,7 +6,7 @@ import random
 #1. Create a function to create a list of students and professors
 
 
-def create_df(num_students, num_profs):
+def create_data(num_students, num_profs):
     # Set a number of students and professors, where s < p
     
     # Create empty lists to append into
