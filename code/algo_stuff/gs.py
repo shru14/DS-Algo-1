@@ -22,4 +22,50 @@ print(prof_preferences)
 # Now, try to implement a basic gale/shapley allocatorb based on the dictionries of preferences. This uses the list of lists as input and matches according to the above create set of preferences for both parties.
 
 print("I don't know this one yet lmao")
+print("We'll find out haha")
+
+tentative_pairs = []
+
+free_stud = []
+
+def init_free_stud():
+    for student in student_preferences.iterkeys():
+        free_stud.append(student)
+
+def stable_matching():
+    while(len(free_stud) > 0):
+        for student in free_stud:
+            start_matching(student)
+
+def start_matching(student):
+    for professor in student_preferences[student]:
+
+        taken_match = [pair for pair in tentative_pairs if professor in pair]
+
+        if (len(taken_match) == 0):
+            tentative_pairs.append([student, professor])
+            free_stud.remove(student)
+            break
+        elif (len(taken_match) > 0):
+            current_student = prof_preferences[professor].index(taken_match[0][0])
+
+            potential_student = prof_preferences[professor].index(student)
+
+            if (current_student > potential_student):
+                free_stud.remove(student)
+
+                free_stud.append(taken_match[0][0])
+
+                taken_match[0][0] = student
+                break
+
+def main():
+    init_free_stud():
+    stable_matching()
+
+
+
+
+
+
 
