@@ -23,6 +23,18 @@ def create_data(num_students, num_profs):
     # Return lists
     return students_list, profs_list
 
+# function to create preferences in one, nxn and with characters instead of names.
+def create_n_n(n):
+    # Initiate empty dictionary to store the preferences
+    preferences = {}
+    
+    # loop through the range of n and create preferences X Y Z for students A B C.
+    for i in n:
+        student = chr(65 + i) # 65 in ASCII is A etc. + i in range(n) for all.
+        random.shuffle(list(range(n))) # make it random
+        preference_list = [chr(88 + j) for j in list(range(n))] # same logic for the actual preferences from X on
+        preferences[student] = preference_list
+    return preferences# assign preferences value to each student key of the dictionary.
 
 
 #2. Create a function to randomly assign students to professors. We speficy a maximum number of students per professor as an additional argument.
