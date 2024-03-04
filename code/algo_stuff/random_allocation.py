@@ -9,7 +9,7 @@ random.seed(111)
 # 1. Random Allocation of Students to Professors
 
 # Call the function from functions.py to create two lists of students and professors. "data" is created as a list of lists, as the underlying function outputs one list for students and profs each, then combined into "data"
-data = functions.create_df(10, 5)
+data = functions.create_data(10, 5)
 
 # Index the list of lists to assign the students and professors.
 # This is done, so they can be individually used as input within the arguments of the random allocater function.
