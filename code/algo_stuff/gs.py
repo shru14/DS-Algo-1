@@ -80,6 +80,18 @@ def stable_matching():
         for student in free_stud:
             start_matching(student)
 
+#Daniyar's Algo
+
+
+tentative_pairs = []
+free_stud  = []
+
+
+def init_free_stud():
+    for stud in student_preferences():
+        free_stud.append(stud)
+
+
 def start_matching(student):
     for professor in student_preferences[student]:
 
