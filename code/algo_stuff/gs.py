@@ -76,9 +76,9 @@ print(pairs)
 
 #Daniyar's Code
 #Firstly, we are creating an empty list of tentative pairs
-tentative_pairs = []
+#tentative_pairs = []
 #Also, creating list of students not allocated to professors
-free_stud = []
+#free_stud = []
 #The function below will append list of free students (not allocated to professors)
 
 #Moving to separate script
