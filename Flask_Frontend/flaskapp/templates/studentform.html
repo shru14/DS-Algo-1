@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+{% block content %}
+    <h1>{{ title }}</h1>
+    <form method="post">
+        {{ form.hidden_tag() }}
+        <div>
+            {{ form.name.label }}<br>
+            {{ form.name }}
+        </div>
+        <div>
+            {{ form.student_number.label }}<br>
+            {{ form.student_number }}
+        </div>
+        <div>
+            {{ form.first_course_choice.label }}<br>
+            {{ form.first_course_choice() }}
+        </div>
+        <div>
+            {{ form.second_course_choice.label }}<br>
+            {{ form.second_course_choice() }}
+        </div>
+        <div>
+            {{ form.third_course_choice.label }}<br>
+            {{ form.third_course_choice() }}
+        </div>
+        <div>
+            {{ form.fourth_course_choice.label }}<br>
+            {{ form.fourth_course_choice() }}
+        </div>
+        <div>
+            {{ form.fifth_course_choice.label }}<br>
+            {{ form.fifth_course_choice() }}
+        </div>
+        <div>
+            {{ form.submit() }}
+        </div>
+    </form>
+{% endblock %}
