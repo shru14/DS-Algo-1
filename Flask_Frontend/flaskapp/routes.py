@@ -59,40 +59,34 @@ def supervisorform():
     return render_template('supervisorform.html', title='Supervisors: Student Ranking', form=form)
 
 
-@app.route('/matching')
-def matching():
-    matches = perform_matching()  
+#run Matching and return output as table
+@app.route('/match', methods=['GET'])
+def match():
 
-    for supervisor_ranking_id, student_number in matches.items():
-        
-        new_match = Match(student_number=student_number, supervisor_ranking_id=supervisor_ranking_id) #creates new match object for each pairing
-        db.session.add(new_match)
-    db.session.commit()
+    #performs matching when request is submitted via the html 
+    if request.method == 'POST':
+        matches = perform_matching()  
 
-    flash('Matching process completed successfully.')
-    return redirect(url_for('home'))
+        #iterates through matches created by GS and stored them in DB
+        for supervisor_ranking_id, student_number in matches.items():
 
+            #creates new match object for each pairing
+            new_match = Match(student_number=student_number, supervisor_ranking_id=supervisor_ranking_id) 
+            db.session.add(new_match)
+        db.session.commit()
 
-#Query Matches 
-@app.route('/viewmatches')
-def viewmatches():
+        flash('Matching process completed successfully.')
+        #reloads page to view match list 
+        return redirect(url_for('match'))
 
-    # Query all matches
-    all_matches = Match.query.all()
-    
-    match_details = []
-    for match in all_matches:
-        student = StudentCourseChoice.query.get(match.student_id)
+    all_matches = db.session.query(
+        Match.id,
+        StudentCourseChoice.name.label('student_name'),
+        SupervisorStudentRanking.course.label('course_name')
+    ).join(
+        StudentCourseChoice, StudentCourseChoice.student_number == Match.student_number
+    ).join(
+        SupervisorStudentRanking, SupervisorStudentRanking.id == Match.supervisor_ranking_id
+    ).all()
 
-       
-        professor = SupervisorStudentRanking.query.filter_by(course=match.course_id).first()
-
-       
-        match_details.append({
-            'student_name': student.name,
-            'student_number': student.student_number,
-            'course': match.course_id,  # Or replace with professor.course if that's more appropriate
-            'professor_name': professor.supervisor_name if professor else "N/A"  # Handling cases where professor might not be found
-        })
-    
-    return render_template('viewmatches.html', matches=match_details)
+    return render_template('match.html', matches=all_matches)

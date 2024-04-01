@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>View and Trigger Matches</title>
+</head>
+<body>
+<div class="container mt-5">
+    <h2>Matches</h2>
+    
+    <!-- Button to trigger matching -->
+    <form action="{{ url_for('matches') }}" method="post">
+        <button type="submit" class="btn btn-primary mb-3">Start Matching Process</button>
+    </form>
+    
+    <!-- Table to display matches -->
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Match ID</th>
+                <th>Student Name</th>
+                <th>Course Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for match in matches %}
+            <tr>
+                <td>{{ match.id }}</td>
+                <td>{{ match.student_name }}</td>
+                <td>{{ match.course_name }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
+{% endblock %}
