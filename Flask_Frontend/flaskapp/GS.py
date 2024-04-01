@@ -6,17 +6,29 @@ def perform_matching():
     student_preferences = {}
     students = StudentCourseChoice.query.all()
     for student in students:
-        student_preferences[student.id] = [student.first_course_choice, student.second_course_choice, student.third_course_choice, student.fourth_course_choice, student.fifth_course_choice]
+        student_preferences[student.student_id] = [
+            student.first_course_choice, 
+            student.second_course_choice, 
+            student.third_course_choice, 
+            student.fourth_course_choice, 
+            student.fifth_course_choice
+        ]
 
     # Fetch supervisor preferences from SQLite Database
     supervisor_preferences = {}
     supervisors = SupervisorStudentRanking.query.all()
     for supervisor in supervisors:
-        supervisor_preferences[supervisor.course] = [supervisor.first_student_choice, supervisor.second_student_choice, supervisor.third_student_choice, supervisor.fourth_student_choice, supervisor.fifth_student_choice]
+        supervisor_preferences[supervisor.course_id] = [
+            supervisor.first_student_choice, 
+            supervisor.second_student_choice, 
+            supervisor.third_student_choice, 
+            supervisor.fourth_student_choice, 
+            supervisor.fifth_student_choice
+        ]
 
-    # return matches as dictionary {student_id: course_id}
+    #Execute GS Matching 
     matches = gs_match(student_preferences, supervisor_preferences)
-
+    return matches
 
 
 #Implementation for simple model of GS (5x5) preference list
@@ -42,4 +54,5 @@ def gs_match(student_preferences, supervisor_preferences):
                 free_students.append(current_match) # As new student is preferred over current match, current match is free again and appended to free list.
             else:
                 free_students.append(student) # Vice versa of above.
-    return matches    
+
+
