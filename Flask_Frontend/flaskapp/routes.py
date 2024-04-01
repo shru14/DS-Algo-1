@@ -59,27 +59,30 @@ def supervisorform():
 
 
 #run Matching and return output as table
-@app.route('/match', methods=['GET'])
+@app.route('/match', methods=['GET', 'POST'])
 def match():
 
     #performs matching when request is submitted via the html 
     if request.method == 'POST':
-        match = perform_matching()  
+        
+        #performs matching process
+        matches = perform_matching()
 
-        #iterates through matches created by GS and stored them in DB
-        for supervisor_ranking_id, student_number in match.items():
-
-            #creates new match object for each pairing
-            new_match = Match(student_number=student_number, supervisor_ranking_id=supervisor_ranking_id) 
+        #creates new match object for each pairing
+        for supervisor_ranking_id, student_number in matches.items():
+            new_match = Match(student_number=student_number, supervisor_ranking_id=supervisor_ranking_id)
             db.session.add(new_match)
-        db.session.commit()
+            db.session.commit()
 
         flash('Matching process completed successfully.')
-        #reloads page to view match list 
+
+        #reload page to view match list 
         return redirect(url_for('match'))
 
+    # Fetch all matches to display
+    # Ensure the joins are correctly matching foreign keys and primary keys
     all_matches = db.session.query(
-        Match.id,
+        Match,
         StudentCourseChoice.name.label('student_name'),
         SupervisorStudentRanking.course.label('course_name')
     ).join(
@@ -88,4 +91,4 @@ def match():
         SupervisorStudentRanking, SupervisorStudentRanking.id == Match.supervisor_ranking_id
     ).all()
 
-    return render_template('match.html', match=all_matches)
+    return render_template('match.html', matches=all_matches)
