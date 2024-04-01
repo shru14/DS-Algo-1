@@ -59,13 +59,13 @@ def supervisorform():
     return render_template('supervisorform.html', title='Supervisors: Student Ranking', form=form)
 
 
-#Route for Matching Procedure
 @app.route('/matching')
 def matching():
-    matches = perform_matching()
+    matches = perform_matching()  
 
-    for prof, student in matches.items():
-        new_match = Match(student_id=student, course_id=prof)  
+    for supervisor_ranking_id, student_number in matches.items():
+        
+        new_match = Match(student_number=student_number, supervisor_ranking_id=supervisor_ranking_id) #creates new match object for each pairing
         db.session.add(new_match)
     db.session.commit()
 
