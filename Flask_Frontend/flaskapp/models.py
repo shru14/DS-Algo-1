@@ -33,7 +33,7 @@ class SupervisorStudentRanking(db.Model):
 class Match(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_number = db.Column(db.Integer, nullable=False)
-    supervisor_ranking_id = db.Column(db.Integer, db.ForeignKey('supervisor_student_ranking.id'), nullable=False)
+    supervisor_ranking_id = db.Column(db.Integer, db.ForeignKey('supervisor_student_ranking.id'), nullable=False) # TO DO: check if i can just store course_id via form input without referencing the foreign key
 
     def __repr__(self):
         return f"<Match(id={self.id}, Student Number={self.student_number}, Supervisor Ranking ID={self.supervisor_ranking_id})>"
