@@ -3,26 +3,26 @@
 <div class="container mt-5">
     <h2>Matching Results</h2>
     
-    <!-- Run matches -->
+    <!-- Button to trigger matching process -->
     <form action="{{ url_for('match') }}" method="post">
         <button type="submit" class="btn btn-primary mb-3">Start Matching Process</button>
     </form>
     
-    <!-- Return matches as table (TO DO: Discuss alternative ways to present the output) -->
+    <!-- Table to display matches -->
     <table class="table">
         <thead>
             <tr>
                 <th>Match ID</th>
-                <th>Student Name</th>
-                <th>Course Name</th>
+                <th>Student Number</th>
+                <th>Course Number</th>
             </tr>
         </thead>
         <tbody>
             {% for match in matches %}
             <tr>
                 <td>{{ match.id }}</td>
-                <td>{{ match.student_name }}</td>
-                <td>{{ match.course_name }}</td>
+                <td>{{ match.student_number }}</td>
+                <td>{{ match.supervisor_ranking_id }}</td>
             </tr>
             {% endfor %}
         </tbody>

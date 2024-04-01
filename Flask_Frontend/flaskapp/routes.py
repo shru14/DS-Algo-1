@@ -72,23 +72,14 @@ def match():
         for supervisor_ranking_id, student_number in matches.items():
             new_match = Match(student_number=student_number, supervisor_ranking_id=supervisor_ranking_id)
             db.session.add(new_match)
-            db.session.commit()
+        db.session.commit()
 
         flash('Matching process completed successfully.')
 
         #reload page to view match list 
         return redirect(url_for('match'))
 
-    # Fetch all matches to display
-    # Ensure the joins are correctly matching foreign keys and primary keys
-    all_matches = db.session.query(
-        Match,
-        StudentCourseChoice.name.label('student_name'),
-        SupervisorStudentRanking.course.label('course_name')
-    ).join(
-        StudentCourseChoice, StudentCourseChoice.student_number == Match.student_number
-    ).join(
-        SupervisorStudentRanking, SupervisorStudentRanking.id == Match.supervisor_ranking_id
-    ).all()
+    #fetch all matches from Match db to show output in flaskapp
+    all_matches = Match.query.all()
 
     return render_template('match.html', matches=all_matches)
