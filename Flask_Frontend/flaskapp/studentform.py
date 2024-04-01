@@ -13,7 +13,7 @@ course_choices = [
 
 class StudentForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
-    student_id = IntegerField('Student ID', validators=[DataRequired()])
+    student_number = IntegerField('Student Number', validators=[DataRequired()])
     first_course_choice = SelectField('First Course Choice', choices=course_choices, validators=[DataRequired()])
     second_course_choice = SelectField('Second Course Choice', choices=course_choices, validators=[DataRequired()])
     third_course_choice = SelectField('Third Course Choice', choices=course_choices, validators=[DataRequired()])
