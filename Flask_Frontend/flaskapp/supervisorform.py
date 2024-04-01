@@ -13,7 +13,6 @@ student_choices = [
 
 class SupervisorForm(FlaskForm):
     course = StringField('Course Title', validators=[DataRequired()])
-    course_id = IntegerField('Course ID', validators=[DataRequired()])
     first_student_choice = SelectField('First Student Choice', choices=student_choices, validators=[DataRequired()])
     second_student_choice = SelectField('Second Student Choice', choices=student_choices, validators=[DataRequired()])
     third_student_choice = SelectField('Third Student Choice', choices=student_choices, validators=[DataRequired()])
