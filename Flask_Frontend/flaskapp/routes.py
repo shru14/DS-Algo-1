@@ -45,7 +45,6 @@ def supervisorform():
     if form.validate_on_submit():
         selection = SupervisorStudentRanking(
             course=form.course.data,
-            supervisor_name=form.supervisor_name.data,
             first_student_choice=form.first_student_choice.data,
             second_student_choice=form.second_student_choice.data,
             third_student_choice=form.third_student_choice.data, 
@@ -65,10 +64,10 @@ def match():
 
     #performs matching when request is submitted via the html 
     if request.method == 'POST':
-        matches = perform_matching()  
+        match = perform_matching()  
 
         #iterates through matches created by GS and stored them in DB
-        for supervisor_ranking_id, student_number in matches.items():
+        for supervisor_ranking_id, student_number in match.items():
 
             #creates new match object for each pairing
             new_match = Match(student_number=student_number, supervisor_ranking_id=supervisor_ranking_id) 
@@ -89,4 +88,4 @@ def match():
         SupervisorStudentRanking, SupervisorStudentRanking.id == Match.supervisor_ranking_id
     ).all()
 
-    return render_template('match.html', matches=all_matches)
+    return render_template('match.html', match=all_matches)
