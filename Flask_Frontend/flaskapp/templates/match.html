@@ -1,21 +1,14 @@
 {% extends "layout.html" %}
 {% block content %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>View and Trigger Matches</title>
-</head>
-<body>
 <div class="container mt-5">
-    <h2>Matches</h2>
+    <h2>Matching Results</h2>
     
-    <!-- Button to trigger matching -->
+    <!-- Run matches -->
     <form action="{{ url_for('match') }}" method="post">
         <button type="submit" class="btn btn-primary mb-3">Start Matching Process</button>
     </form>
     
-    <!-- Table to display matches -->
+    <!-- Return matches as table (TO DO: Discuss alternative ways to present the output) -->
     <table class="table">
         <thead>
             <tr>
@@ -35,6 +28,4 @@
         </tbody>
     </table>
 </div>
-</body>
-</html>
 {% endblock %}
