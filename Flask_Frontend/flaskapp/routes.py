@@ -64,6 +64,10 @@ def match():
 
     #performs matching when request is submitted via the html 
     if request.method == 'POST':
+
+        #clears out old matches (otherwise output table in flask will copy each new output table and add it to the old one)
+        Match.query.delete()
+        db.session.commit()
         
         #performs matching process
         matches = perform_matching()
