@@ -28,7 +28,9 @@ def perform_matching():
 
     #Execute GS Matching 
     matches = gs_match(student_preferences, supervisor_preferences)
-    return matches
+
+    #ensuring matches is dictionary + returning dictionary
+    return matches if isinstance(matches, dict) else {}
 
 
 #Implementation for simple model of GS (5x5) preference list
@@ -55,4 +57,5 @@ def gs_match(student_preferences, supervisor_preferences):
             else:
                 free_students.append(student) # Vice versa of above.
 
+    return matches
 
