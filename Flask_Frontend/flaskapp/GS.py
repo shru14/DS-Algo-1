@@ -6,7 +6,7 @@ def perform_matching():
     student_preferences = {}
     students = StudentCourseChoice.query.all()
     for student in students:
-        student_preferences[student.student_id] = [
+        student_preferences[student.id] = [
             student.first_course_choice, 
             student.second_course_choice, 
             student.third_course_choice, 
@@ -18,7 +18,7 @@ def perform_matching():
     supervisor_preferences = {}
     supervisors = SupervisorStudentRanking.query.all()
     for supervisor in supervisors:
-        supervisor_preferences[supervisor.course_id] = [
+        supervisor_preferences[supervisor.id] = [
             supervisor.first_student_choice, 
             supervisor.second_student_choice, 
             supervisor.third_student_choice, 
