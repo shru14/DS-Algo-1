@@ -1,6 +1,6 @@
 from flaskapp import db
 
-  # Model for storing student course choices
+#Model for storing student course choices
 class StudentCourseChoice(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -16,7 +16,7 @@ class StudentCourseChoice(db.Model):
     
 
 
-  # Model for storing supervisor student ranking
+#Model for storing supervisor student ranking
 class SupervisorStudentRanking(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     course = db.Column(db.String(100), nullable=False)
@@ -29,7 +29,7 @@ class SupervisorStudentRanking(db.Model):
     def __repr__(self):
         return f"SupervisorStudentRanking('{self.id}', '{self.course}', {self.first_student_choice}', '{self.second_student_choice}', '{self.third_student_choice}, '{self.fourth_student_choice}', '{self.fifth_student_choice}')"
     
-
+#Model for storing matches 
 class Match(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_number = db.Column(db.Integer, nullable=False)
