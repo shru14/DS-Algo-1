@@ -1,9 +1,0 @@
-{% extends "base.html" %}
-{% block content %}
-<h2>Match Results</h2>
-<ul>
-    {% for match in matches %}
-    <li>{{ match.student_name }} ({{ match.student_number }}) matched with {{ match.course }} by {{ match.professor_name }}</li>
-    {% endfor %}
-</ul>
-{% endblock %}

@@ -45,7 +45,6 @@ def supervisorform():
     if form.validate_on_submit():
         selection = SupervisorStudentRanking(
             course=form.course.data,
-            supervisor_name=form.supervisor_name.data,
             first_student_choice=form.first_student_choice.data,
             second_student_choice=form.second_student_choice.data,
             third_student_choice=form.third_student_choice.data, 
@@ -59,40 +58,32 @@ def supervisorform():
     return render_template('supervisorform.html', title='Supervisors: Student Ranking', form=form)
 
 
-#Route for Matching Procedure
-@app.route('/matching')
-def matching():
-    matches = perform_matching()
+#run Matching and return output as table
+@app.route('/match', methods=['GET', 'POST'])
+def match():
 
-    for prof, student in matches.items():
-        new_match = Match(student_id=student, course_id=prof)  
-        db.session.add(new_match)
-    db.session.commit()
+    #performs matching when request is submitted via the html 
+    if request.method == 'POST':
 
-    flash('Matching process completed successfully.')
-    return redirect(url_for('home'))
+        #clears out old matches (otherwise output table in flask will copy each new output table and add it to the old one)
+        Match.query.delete()
+        db.session.commit()
+        
+        #performs matching process
+        matches = perform_matching()
 
+        #creates new match object for each pairing
+        for supervisor_ranking_id, student_number in matches.items():
+            new_match = Match(student_number=student_number, supervisor_ranking_id=supervisor_ranking_id)
+            db.session.add(new_match)
+        db.session.commit()
 
-#Query Matches 
-@app.route('/viewmatches')
-def viewmatches():
+        flash('Matching process completed successfully.')
 
-    # Query all matches
+        #reload page to view match list 
+        return redirect(url_for('match'))
+
+    #fetch all matches from Match db to show output in flaskapp
     all_matches = Match.query.all()
-    
-    match_details = []
-    for match in all_matches:
-        student = StudentCourseChoice.query.get(match.student_id)
 
-       
-        professor = SupervisorStudentRanking.query.filter_by(course=match.course_id).first()
-
-       
-        match_details.append({
-            'student_name': student.name,
-            'student_number': student.student_number,
-            'course': match.course_id,  # Or replace with professor.course if that's more appropriate
-            'professor_name': professor.supervisor_name if professor else "N/A"  # Handling cases where professor might not be found
-        })
-    
-    return render_template('viewmatches.html', matches=match_details)
+    return render_template('match.html', matches=all_matches)
