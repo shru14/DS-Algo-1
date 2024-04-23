@@ -17,12 +17,10 @@ def home():
 def about():
     return render_template('about.html', title='About page')
 
-
 # Route for studentform page
 @app.route("/studentform", methods=['GET', 'POST'])
 def studentform():
     form = StudentForm()
-
     if form.validate_on_submit():
         # If form validation succeeds, process the form data
         selection = StudentCourseChoice(
@@ -36,8 +34,7 @@ def studentform():
         )
         db.session.add(selection)
         db.session.commit()
-        flash(
-            'Thank you! Your course selection has been submitted. Your final course allocation will be published shortly.')
+        flash('Thank you! Your course selection has been submitted. Your final course allocation will be published shortly.')
         return redirect(url_for('home'))
 
     # If form validation fails, render the form template with error messages
