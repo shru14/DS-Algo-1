@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, SubmitField, SelectField
 from wtforms.validators import DataRequired, ValidationError, NumberRange
+from flaskapp.models import StudentCourseChoice
 
 # Define Student Course Choice
 course_choices = [
@@ -22,21 +23,6 @@ class StudentForm(FlaskForm):
     fifth_course_choice = SelectField('Fifth Course Choice', choices=course_choices, validators=[DataRequired()])
     submit = SubmitField('Submit')
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Update choices for subsequent course choices based on previous selections
-        self.second_course_choice.choices = self._get_filtered_course_choices([])
-        self.third_course_choice.choices = self._get_filtered_course_choices([self.first_course_choice.data])
-        self.fourth_course_choice.choices = self._get_filtered_course_choices(
-            [self.first_course_choice.data, self.second_course_choice.data])
-        self.fifth_course_choice.choices = self._get_filtered_course_choices(
-            [self.first_course_choice.data, self.second_course_choice.data, self.third_course_choice.data])
-
-    def _get_filtered_course_choices(self, selected_courses):
-        # Filter out selected courses from the available course choices
-        filtered_choices = [(value, label) for value, label in course_choices if value not in selected_courses]
-        return filtered_choices
-
     def validate(self):
         # Call base class validation
         if not super().validate():
@@ -52,26 +38,34 @@ class StudentForm(FlaskForm):
             self.fourth_course_choice,
             self.fifth_course_choice
         ]):
-            # Raise custom validation error
+        # Raise custom validation error
             raise ValidationError('Please fill in all the necessary fields.')
 
-        # Check for duplicate course selections
-        selected_courses = [
+        # Check for duplicate course choices
+        chosen_courses = [
             self.first_course_choice.data,
             self.second_course_choice.data,
             self.third_course_choice.data,
             self.fourth_course_choice.data,
             self.fifth_course_choice.data
         ]
-        if len(selected_courses) != len(set(selected_courses)):
-            # Get the indices of duplicate course selections
-            duplicates = set([course for course in selected_courses if selected_courses.count(course) > 1])
-            for field in [self.first_course_choice, self.second_course_choice, self.third_course_choice,
-                          self.fourth_course_choice, self.fifth_course_choice]:
-                if field.data in duplicates:
-                    field.errors.append('Please select each course only once.')  # Append error message to the field
+        if len(chosen_courses) != len(set(chosen_courses)):
+            raise ValidationError("Each course can only be picked once.")
 
-            # Raise validation error
-            raise ValidationError('Please select each course only once.')
+            # Check for existing student by student_number and name
+        existing_student = StudentCourseChoice.query.filter_by(student_number=self.student_number.data).first()
+        if existing_student and existing_student.name != self.name.data:
+            # If a student with the same student_number but different name exists, replace it
+            existing_student.name = self.name.data
+            existing_student.first_course_choice = self.first_course_choice.data
+            existing_student.second_course_choice = self.second_course_choice.data
+            existing_student.third_course_choice = self.third_course_choice.data
+            existing_student.fourth_course_choice = self.fourth_course_choice.data
+            existing_student.fifth_course_choice = self.fifth_course_choice.data
+            db.session.commit()
+            return True
+        elif existing_student:
+            # If a student with the same student_number and name exists, raise error
+            raise ValidationError("A student with the same student number already exists.")
 
         return True
