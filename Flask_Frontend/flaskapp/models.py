@@ -1,4 +1,6 @@
 from flaskapp import db
+from flask_sqlalchemy import SQLAlchemy
+#db = SQLAlchemy()
 
 #Model for storing student course choices
 class StudentCourseChoice(db.Model):
