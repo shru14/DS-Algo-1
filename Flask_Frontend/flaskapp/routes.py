@@ -39,7 +39,8 @@ def studentform():
 
     # If form validation fails, render the form template with error messages
     # Pass the form object to the template to display error messages next to the fields
-    return render_template('studentform.html', title='Students: Course Selection', form=form)
+    else:
+        return render_template('studentform.html', title='Students: Course Selection', form=form)
 
 
 # Route for Supervisor page

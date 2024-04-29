@@ -2,6 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, SubmitField, SelectField
 from wtforms.validators import DataRequired, ValidationError, NumberRange
 from flaskapp.models import StudentCourseChoice
+from flaskapp import db
 
 # Define Student Course Choice
 course_choices = [
@@ -23,9 +24,9 @@ class StudentForm(FlaskForm):
     fifth_course_choice = SelectField('Fifth Course Choice', choices=course_choices, validators=[DataRequired()])
     submit = SubmitField('Submit')
 
-    def validate(self):
+    def validate(self, **kwargs):
         # Call base class validation
-        if not super().validate():
+        if not super().validate(**kwargs):
             return False
 
         # Check if any of the fields are empty
@@ -50,22 +51,30 @@ class StudentForm(FlaskForm):
             self.fifth_course_choice.data
         ]
         if len(chosen_courses) != len(set(chosen_courses)):
-            raise ValidationError("Each course can only be picked once.")
+            error_message = "Each course can only be picked once."
+            # You can attach this error to one of the course choice fields, or a custom field for form-level errors.
+            self.first_course_choice.errors.append(error_message)
+            # Returning False here indicates validation failure
+            return False
 
             # Check for existing student by student_number and name
         existing_student = StudentCourseChoice.query.filter_by(student_number=self.student_number.data).first()
-        if existing_student and existing_student.name != self.name.data:
-            # If a student with the same student_number but different name exists, replace it
-            existing_student.name = self.name.data
-            existing_student.first_course_choice = self.first_course_choice.data
-            existing_student.second_course_choice = self.second_course_choice.data
-            existing_student.third_course_choice = self.third_course_choice.data
-            existing_student.fourth_course_choice = self.fourth_course_choice.data
-            existing_student.fifth_course_choice = self.fifth_course_choice.data
-            db.session.commit()
-            return True
-        elif existing_student:
-            # If a student with the same student_number and name exists, raise error
-            raise ValidationError("A student with the same student number already exists.")
+        if existing_student:
+            if existing_student.name == self.name.data:
+                error_message_2 = "A student with the same student number already exists."
+                self.student_number.errors.append(error_message_2)
+                return False
 
-        return True
+            else:
+                # If a student with the same student_number but different name exists, replace it
+                existing_student.name = self.name.data
+                existing_student.first_course_choice = self.first_course_choice.data
+                existing_student.second_course_choice = self.second_course_choice.data
+                existing_student.third_course_choice = self.third_course_choice.data
+                existing_student.fourth_course_choice = self.fourth_course_choice.data
+                existing_student.fifth_course_choice = self.fifth_course_choice.data
+                db.session.commit()
+                return True
+        else:
+            # No existing student, so proceed
+            return True
