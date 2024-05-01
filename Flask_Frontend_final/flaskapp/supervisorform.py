@@ -1,75 +1,55 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, SubmitField, SelectField
 from wtforms.validators import DataRequired, ValidationError, NumberRange
-from flaskapp.studentform import course_choices
-from flaskapp.models import SupervisorStudentRanking
+from flaskapp.models import Student, SupervisorStudentRanking, Course
 from .extensions import db
 
-#Define Student Course Choice
-#Defined list of allowed student numbers --> should create error in student input form if student nr is outside range
-student_number = [
-    ('', 'Please enter student ranking'),
-    ('9991', '9991'),
-    ('9992', '9992'),
-    ('9993', '9993'),
-    ('9994', '9994'),
-    ('9995', '9995')
-]
 
 class SupervisorForm(FlaskForm):
-    supervisor = StringField('Supervisor Name', validators=[DataRequired(message="Please enter your name.")])
-    course = SelectField('Course', choices=course_choices, validators=[DataRequired(message="Please select your class.")])
-    first_student_choice = SelectField('First Student Choice', choices=student_number, validators=[DataRequired(message="Please enter your ranking.")])
-    second_student_choice = SelectField('Second Student Choice', choices=student_number, validators=[DataRequired(message="Please enter your ranking.")])
-    third_student_choice = SelectField('Third Student Choice', choices=student_number, validators=[DataRequired(message="Please enter your ranking.")])
-    fourth_student_choice = SelectField('Fourth Student Choice', choices=student_number, validators=[DataRequired(message="Please enter your ranking.")])
-    fifth_student_choice = SelectField('Fifth Student Choice', choices=student_number, validators=[DataRequired(message="Please enter your ranking.")])
+    supervisor = StringField('Supervisor Name', validators=[DataRequired()])
+    course = SelectField('Course', coerce=int, validators=[DataRequired()])
+    first_student_choice = SelectField('First Student Choice', validators=[DataRequired()])
+    second_student_choice = SelectField('Second Student Choice', validators=[DataRequired()])
+    third_student_choice = SelectField('Third Student Choice', validators=[DataRequired()])
+    fourth_student_choice = SelectField('Fourth Student Choice', validators=[DataRequired()])
+    fifth_student_choice = SelectField('Fifth Student Choice', validators=[DataRequired()])
+    capacity = IntegerField('Capacity', validators=[DataRequired(), NumberRange(min=1, message="Capacity must be at least 1")])
     submit = SubmitField('Submit')
 
-    def validate(self, **kwargs):
-            # Call base class validation
-            if not super().validate(**kwargs):
+    
+    def __init__(self, *args, **kwargs):
+        super(SupervisorForm, self).__init__(*args, **kwargs)
+        self.course.choices = [(course.id, course.name) for course in Course.query.all()]
+        self.first_student_choice.choices = [(s.student_number, s.name) for s in Student.query.all()]
+        self.second_student_choice.choices = [(s.student_number, s.name) for s in Student.query.all()]
+        self.third_student_choice.choices = [(s.student_number, s.name) for s in Student.query.all()]
+        self.fourth_student_choice.choices = [(s.student_number, s.name) for s in Student.query.all()]
+        self.fifth_student_choice.choices = [(s.student_number, s.name) for s in Student.query.all()]
+
+#Error handling
+    def validate(self):
+            if not super().validate():
                 return False
 
             # Check if any of the fields are empty
-            if not all(field.data for field in [
-                self.supervisor,
-                self.course,
-                self.first_student_choice,
-                self.second_student_choice,
-                self.third_student_choice,
-                self.fourth_student_choice,
-                self.fifth_student_choice
-            ]):
-            # Raise custom validation error
+            if not all([self.supervisor.data, self.course.data,
+                        self.first_student_choice.data, self.second_student_choice.data,
+                        self.third_student_choice.data, self.fourth_student_choice.data,
+                        self.fifth_student_choice.data]):
                 raise ValidationError('Please fill in all the necessary fields.')
-
-            # Check for duplicate student choices
-            chosen_students = [
-                self.first_student_choice.data,
-                self.second_student_choice.data,
-                self.third_student_choice.data,
-                self.fourth_student_choice.data,
-                self.fifth_student_choice.data
-            ]
-            if len(chosen_students) != len(set(chosen_students)):
-                error_message = "Each student can only be picked once."
-                # You can attach this error to one of the student choice fields, or a custom field for form-level errors.
-                self.first_student_choice.errors.append(error_message)
-                # Returning False here indicates validation failure
                 return False
 
-                # Check for existing superviros by name
+            # Check for duplicate student choices
+            student_choices = [self.first_student_choice.data, self.second_student_choice.data,
+                            self.third_student_choice.data, self.fourth_student_choice.data,
+                            self.fifth_student_choice.data]
+            if len(student_choices) != len(set(student_choices)):
+                self.first_student_choice.errors.append("Each student can only be picked once.")
+                return False
+
+            # Check for existing supervisor by name
             existing_supervisor = SupervisorStudentRanking.query.filter_by(supervisor=self.supervisor.data).first()
             if existing_supervisor:
-                if existing_supervisor.supervisor == self.supervisor.data:
-                    error_message_2 = "A supervisor with the same name already exists."
-                    self.supervisor.errors.append(error_message_2)
-                    return False
-
-                else:
-                  
-                    return True
-            else:
-                # No existing student, so proceed
-                return True
+                self.supervisor.errors.append("A supervisor with the same name already exists.")
+                return False
+            return True

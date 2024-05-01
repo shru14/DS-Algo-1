@@ -27,9 +27,10 @@ class SupervisorStudentRanking(db.Model):
     third_student_choice = db.Column(db.String(50), nullable=False)
     fourth_student_choice = db.Column(db.String(50), nullable=False)
     fifth_student_choice = db.Column(db.String(50), nullable=False)
+    capacity = db.Column(db.Integer, default=1)
 
     def __repr__(self):
-        return f"SupervisorStudentRanking('{self.id}', '{self.course}', {self.first_student_choice}', '{self.second_student_choice}', '{self.third_student_choice}, '{self.fourth_student_choice}', '{self.fifth_student_choice}')"
+        return f"SupervisorStudentRanking('{self.id}', '{self.course}', {self.first_student_choice}', '{self.second_student_choice}', '{self.third_student_choice}, '{self.fourth_student_choice}', '{self.fifth_student_choice}', '{self.capacity}')"
     
 #Model for storing matches 
 class Match(db.Model):
@@ -49,4 +50,15 @@ class Configuration(db.Model):
 
     def __repr__(self):
         return f"<Configuration(key='{self.key}', value='{self.value}')>"   
+    
+#Model for storing course options
+class Course(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+
+#Model for storing students
+class Student(db.Model):
+    student_number = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+
 

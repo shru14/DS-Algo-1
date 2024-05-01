@@ -1,18 +1,14 @@
 from flaskapp.models import StudentCourseChoice, SupervisorStudentRanking, Configuration
+from flask_sqlalchemy import SQLAlchemy
 
 
-#TO DO: Adjust perform_matching to fetch correct implementation of GS based on the chosen configuration
-def perform_matching():
-    # Fetching student preferences from the SQLite Database
+def get_student_preferences():
+    #Fetching student preferences mapped to their course choices
     student_preferences = {}
     students = StudentCourseChoice.query.all()
     for student in students:
-
-        #Extracting numerical part of course description before the dash
         student_preferences[student.student_number] = [
-            int(choice.split(' - ')[0])  
-
-            for choice in [
+            int(choice.split(' - ')[0]) for choice in [
                 student.first_course_choice,
                 student.second_course_choice,
                 student.third_course_choice,
@@ -20,37 +16,43 @@ def perform_matching():
                 student.fifth_course_choice
             ]
         ]
+    return student_preferences
 
-    # Fetching supervisor preferences from the SQLite Database
+
+def get_supervisor_preferences():
+    # Fetching supervisor preferences mapped to their student choices
     supervisor_preferences = {}
     supervisors = SupervisorStudentRanking.query.all()
     for supervisor in supervisors:
-
-        #Extracting numerical value which functions as course ID for matching
-        course_id = int(supervisor.course.split(' - ')[0])
-
-        supervisor_preferences[course_id] = [
-            # Assuming student choices are numerical IDs
-            supervisor.first_student_choice,
-            supervisor.second_student_choice,
-            supervisor.third_student_choice,
-            supervisor.fourth_student_choice,
-            supervisor.fifth_student_choice
+        supervisor_preferences[supervisor.id] = [
+            int(student) for student in [
+                supervisor.first_student_choice,
+                supervisor.second_student_choice,
+                supervisor.third_student_choice,
+                supervisor.fourth_student_choice,
+                supervisor.fifth_student_choice
+            ]
         ]
+    return supervisor_preferences
+
+student_preferences = get_student_preferences()
+supervisor_preferences = get_supervisor_preferences()
 
 
-    #Execute GS Matching 
-    matches = gs_match(student_preferences, supervisor_preferences)
+def perform_matching():
+    # Fetch the current active configuration
+    active_config = Configuration.query.filter_by(key='active_scenario').first()
 
-    #ensuring matches is dictionary + returning dictionary
-    return matches if isinstance(matches, dict) else {}
+    if active_config.value == '1':
+        return default_gs_match(student_preferences, supervisor_preferences)
+    elif active_config.value == '2':
+        return capacity_gs_match(student_preferences, supervisor_preferences)
+    elif active_config.value == '3':
+        return uneven_gs_match(student_preferences, supervisor_preferences)    
 
 
-
-
-#Implementation for simple model of GS (5x5) preference list
-#Adjusted object names to the ones used in this flask app implementation
-def gs_match(student_preferences, supervisor_preferences):
+#Scneario 1: Default GS Match
+def default_gs_match(student_preferences, supervisor_preferences):
     matches = {}
     free_students = list(student_preferences.keys())
 
@@ -90,5 +92,61 @@ def gs_match(student_preferences, supervisor_preferences):
                 print(f"Error: {e}. Data mismatch in preferences for {preferred_course}.")
                 if student_preferences[student]:
                     free_students.append(student)
+
+    return matches
+
+#Scenario 2: Limited Capacity GS Match
+#TO DO: store capacity of professors
+def capacity_gs_match():
+    student_preferences = get_student_preferences()
+    supervisor_preferences = get_supervisor_preferences()
+    prof_capacities = {supervisor_id: 3 for supervisor_id in supervisor_preferences}  
+
+    matches = {}
+    prof_matches = {prof: [] for prof in supervisor_preferences}
+    unmatched_students = set(student_preferences.keys())
+
+    while unmatched_students:
+        student = unmatched_students.pop()
+        for prof in student_preferences[student]:
+            if len(prof_matches[prof]) < prof_capacities[prof]:
+                matches[student] = prof
+                prof_matches[prof].append(student)
+                break
+            else:
+                least_pref_student = min(prof_matches[prof], key=lambda x: supervisor_preferences[prof].index(x))
+                if supervisor_preferences[prof].index(student) < supervisor_preferences[prof].index(least_pref_student):
+                    matches.pop(least_pref_student)
+                    prof_matches[prof].remove(least_pref_student)
+                    matches[student] = prof
+                    prof_matches[prof].append(student)
+                    unmatched_students.add(least_pref_student)
+    return matches
+
+
+#Scenario 3: Uneven Preferences GS Match 
+def uneven_gs_match():
+    student_preferences = get_student_preferences()
+    supervisor_preferences = get_supervisor_preferences()
+
+    matches = {}
+    prof_matches = {prof: [] for prof in supervisor_preferences}
+    unmatched_students = set(student_preferences.keys())
+
+    while unmatched_students:
+        student = unmatched_students.pop()
+        for prof in student_preferences[student]:
+            if prof in supervisor_preferences and len(prof_matches[prof]) < len(supervisor_preferences[prof]):
+                if student not in matches:
+                    matches[student] = prof
+                    prof_matches[prof].append(student)
+                    break
+                least_preferred_student = prof_matches[prof][-1]
+                if supervisor_preferences[prof].index(student) < supervisor_preferences[prof].index(least_preferred_student):
+                    matches.pop(least_preferred_student)
+                    matches[student] = prof
+                    prof_matches[prof].remove(least_preferred_student)
+                    prof_matches[prof].append(student)
+                    unmatched_students.add(least_preferred_student)
 
     return matches
