@@ -1,65 +1,59 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, SubmitField, SelectField
-from wtforms.validators import DataRequired, ValidationError, NumberRange
+from wtforms.validators import DataRequired
 from flaskapp.models import Course, StudentCourseChoice
-from .extensions import db
+from flask import session
 
 
-#Dynamic input 
 class StudentForm(FlaskForm):
+
+    #predfined fields that do not change dynamically
     name = StringField('Name', validators=[DataRequired()])
     student_number = IntegerField('Student Number', validators=[DataRequired()])
-    first_course_choice = SelectField('First Course Choice', validators=[DataRequired()])
-    second_course_choice = SelectField('Second Course Choice', validators=[DataRequired()])
-    third_course_choice = SelectField('Third Course Choice', validators=[DataRequired()])
-    fourth_course_choice = SelectField('Fourth Course Choice', validators=[DataRequired()])
-    fifth_course_choice = SelectField('Fifth Course Choice', validators=[DataRequired()])
     submit = SubmitField('Submit')
 
+    #Initialization to adjust fields dynamically based on configuration 
+    #configuration=None passes configuration value to form, by default set to None
+    #current configuration is fetched from session in the route
+    def __init__(self, configuration=None, *args, **kwargs):
 
-    def __init__(self, *args, **kwargs):
+        #passes initialisation of FlaskForm constructor to Studentform 
         super(StudentForm, self).__init__(*args, **kwargs)
-        self.first_course_choice.choices = [(c.id, c.name) for c in Course.query.all()]
-        self.second_course_choice.choices = [(c.id, c.name) for c in Course.query.all()]
-        self.third_course_choice.choices = [(c.id, c.name) for c in Course.query.all()]
-        self.fourth_course_choice.choices = [(c.id, c.name) for c in Course.query.all()]
-        self.fifth_course_choice.choices = [(c.id, c.name) for c in Course.query.all()]
 
-#Error handling 
+        #queries course names from database
+        courses = [(c.id, c.name) for c in Course.query.order_by(Course.name).all()]
+        
+        #rules for dynamic field changes based on configuration
+        if configuration == 'even_preferences':
+            field_names = ['first_course_choice', 'second_course_choice', 'third_course_choice', 'fourth_course_choice', 'fifth_course_choice']
+        elif configuration in ['limited_capacity', 'uneven_preferences']:
+            field_names = ['first_course_choice', 'second_course_choice', 'third_course_choice']
+
+        #dynamic drop down fiels based on configuration
+        for field_name in field_names:
+            setattr(self, field_name, SelectField(field_name.replace('_', ' ').title(), validators=[DataRequired()], choices=courses))
+
+    #checking that all forms are valid
     def validate(self):
-        # Call the base class validate
         if not super().validate():
             return False
 
-        # Check if any of the fields are empty
-        if not all([self.name.data, self.student_number.data, self.first_course_choice.data,
-                    self.second_course_choice.data, self.third_course_choice.data,
-                    self.fourth_course_choice.data, self.fifth_course_choice.data]):
-            raise ValidationError('Please fill in all the necessary fields.')
+        #checking that all fields are filled
+        filled_fields = [getattr(self, f) for f in self.__dict__.keys() if f.endswith('_course_choice')]
+        if not all(field.data for field in filled_fields):
+            self.errors['course_choices'] = ['Please fill in all the necessary fields.']
             return False
 
-        # Check for duplicate course choices
-        course_choices = [self.first_course_choice.data, self.second_course_choice.data,
-                          self.third_course_choice.data, self.fourth_course_choice.data,
-                          self.fifth_course_choice.data]
+        #each course choice can only be picked once 
+        course_choices = [field.data for field in filled_fields]
         if len(course_choices) != len(set(course_choices)):
-            self.first_course_choice.errors.append("Each course can only be picked once.")
+            self.errors['course_choices'] = ["Each course can only be picked once."]
             return False
 
-        # Check for existing student by student_number and name
+        #checking that student numbers are only used once 
         existing_student = StudentCourseChoice.query.filter_by(student_number=self.student_number.data).first()
-        if existing_student:
-            if existing_student.name == self.name.data:
-                self.student_number.errors.append("A student with the same student number and name already exists.")
-                return False
-            else:
-                # Update the existing record
-                existing_student.name = self.name.data
-                existing_student.first_course_choice = self.first_course_choice.data
-                existing_student.second_course_choice = self.second_course_choice.data
-                existing_student.third_course_choice = self.third_course_choice.data
-                existing_student.fourth_course_choice = self.fourth_course_choice.data
-                existing_student.fifth_course_choice = self.fifth_course_choice.data
-                db.session.commit()
-                return True
+        if existing_student and existing_student.name == self.name.data:
+            self.student_number.errors.append("A student with the same student number and name already exists.")
+            return False
+
         return True

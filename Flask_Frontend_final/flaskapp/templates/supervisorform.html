@@ -1,8 +1,9 @@
 {% extends "layout.html" %}
 {% block content %}
 <h1>{{ title }}</h1>
+<p>Current configuration: {{ current_configuration }}</p>
 <form method="post">
-    {{ form.hidden_tag() }} <!-- CSRF protection token -->
+    {{ form.hidden_tag() }} 
     <div>
         {{ form.supervisor.label }}<br>
         {{ form.supervisor(size=32) }}
@@ -17,9 +18,10 @@
             <span style="color: red;">{{ error }}</span><br>
         {% endfor %}
     </div>
-
-    <!-- Render fields for student choices -->
-    {% for field in [form.first_student_choice, form.second_student_choice, form.third_student_choice, form.fourth_student_choice, form.fifth_student_choice] %}
+    
+    <!-- Using Jinja for dynamic field adjustment-->
+    <!-- Dynamic student ranking: All choices exist in all configurations  -->
+    {% for field in form.student_choices %}
     <div>
         {{ field.label }}<br>
         {{ field() }}
@@ -29,13 +31,18 @@
     </div>
     {% endfor %}
 
-    <div>
-        {{ form.capacity.label }}<br>
-        {{ form.capacity(size=5) }} 
-        {% for error in form.capacity.errors %}
-            <span style="color: red;">{{ error }}</span><br>
-        {% endfor %}
-    </div>
+    <!-- Dynamic adjustment: capacity field for limited capacity configuration  -->
+    {% if configuration == 'limited_capacity' %}
+        {# Render fields for limited_capacity, include capacity field #}
+        <div>
+            {{ form.capacity.label }}<br>
+            {{ form.capacity() }}
+            {% for error in form.capacity.errors %}
+                <span style="color: red;">{{ error }}</span><br>
+            {% endfor %}
+        </div>
+    {% endif %}
+
     <div class="form-group">
         {{ form.submit(class="btn btn-primary mt-3") }}
     </div>

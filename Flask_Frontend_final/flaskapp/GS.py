@@ -41,13 +41,13 @@ supervisor_preferences = get_supervisor_preferences()
 
 def perform_matching():
     # Fetch the current active configuration
-    active_config = Configuration.query.filter_by(key='active_scenario').first()
+    current_config = Configuration.query.filter_by(key='configuration').first()
 
-    if active_config.value == '1':
+    if current_config.value == 'even_preferences':
         return default_gs_match(student_preferences, supervisor_preferences)
-    elif active_config.value == '2':
+    elif current_config.value == 'limited_capacity':
         return capacity_gs_match(student_preferences, supervisor_preferences)
-    elif active_config.value == '3':
+    elif current_config.value == 'uneven_preferences':
         return uneven_gs_match(student_preferences, supervisor_preferences)    
 
 
@@ -59,14 +59,16 @@ def default_gs_match(student_preferences, supervisor_preferences):
     while free_students:
         student = free_students.pop(0)
         if not student_preferences[student]:
-            continue  # Skip if student has no more preferences
+            continue  
 
         preferred_course = student_preferences[student].pop(0)
         print(f"Attempting to match Student {student} with Course {preferred_course}")
 
         if preferred_course not in supervisor_preferences:
             print(f"No supervisor preference found for {preferred_course}.")
-            if student_preferences[student]:  # Check if student still has preferences left
+
+            #Checking if student still has preferences left
+            if student_preferences[student]:  
                 free_students.append(student)
             continue
         
@@ -96,7 +98,6 @@ def default_gs_match(student_preferences, supervisor_preferences):
     return matches
 
 #Scenario 2: Limited Capacity GS Match
-#TO DO: store capacity of professors
 def capacity_gs_match():
     student_preferences = get_student_preferences()
     supervisor_preferences = get_supervisor_preferences()

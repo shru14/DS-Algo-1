@@ -24,6 +24,7 @@
             {% for match in matches %}
             <tr>
                 <td>{{ match.match_id }}</td>
+                <td>{{ match.student_name or 'Not matched' }}</td>
                 <td>{{ match.student_name }}</td>
                 <td>{{ match.student_number }}</td>
                 <td>{{ match.course_number }}</td>

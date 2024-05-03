@@ -1,12 +1,12 @@
 from .extensions import db
 from flask_sqlalchemy import SQLAlchemy
-#db = SQLAlchemy()
+
 
 #Model for storing student course choices
 class StudentCourseChoice(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
     student_number = db.Column(db.Integer, nullable=False)
+    name = db.Column(db.String(100), nullable=False)
     first_course_choice = db.Column(db.String(50), nullable=False)
     second_course_choice = db.Column(db.String(50), nullable=False)
     third_course_choice = db.Column(db.String(50), nullable=False)
@@ -60,5 +60,4 @@ class Course(db.Model):
 class Student(db.Model):
     student_number = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-
 

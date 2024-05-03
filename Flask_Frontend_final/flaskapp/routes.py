@@ -1,8 +1,7 @@
-from typing import NotRequired
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, session
 from flask import current_app as app
 from .extensions import db
-from flaskapp.models import StudentCourseChoice, SupervisorStudentRanking, Match, Configuration, Course
+from flaskapp.models import StudentCourseChoice, SupervisorStudentRanking, Match, Configuration, Course, Student, db
 from flaskapp.studentform import StudentForm
 from flaskapp.supervisorform import SupervisorForm
 from flaskapp.GS import perform_matching
@@ -10,135 +9,109 @@ from flaskapp.models import Configuration
 from flaskapp.admin import ConfigForm
 
 
-
-# Route for the home page, which is where the blog posts will be shown
+#Route for home
 @app.route("/")
 @app.route("/home")
 def home():
     return render_template('home.html', title='Course Selection Spring 2024')
 
-'''
-# Route for studentform page
-@app.route("/studentform", methods=['GET', 'POST'])
-def studentform():
-    form = StudentForm()
-    if form.validate_on_submit():
-        selection = StudentCourseChoice(
-            name=form.name.data,
-            student_number=form.student_number.data,
-            first_course_choice=form.first_course_choice.data,
-            second_course_choice=form.second_course_choice.data,
-            third_course_choice=form.third_course_choice.data, 
-            fourth_course_choice=form.fourth_course_choice.data,
-            fifth_course_choice=form.fifth_course_choice.data
-        )
-        db.session.add(selection)
-        db.session.commit()
-        flash('Thank you! Your course selection has been submitted. Your final course allocation will be published shortly.')
-        return redirect(url_for('home'))
-    
-     # If form validation fails, render the form template with error messages
-    # Pass the form object to the template to display error messages next to the fields
-    else:
-        return render_template('studentform.html', title='Students: Course Selection', form=form)
-'''
 
-#student choice for dynamic input fields 
+#Route for studentform
 @app.route('/studentform', methods=['GET', 'POST'])
 def studentform():
-    form = StudentForm()
-    if request.method == 'POST' and form.validate_on_submit():
 
-        # Process the form data, save to database, etc.
-        flash('Thank you! Your course selection has been submitted. Your final course allocation will be published shortly.')
-        return redirect(url_for('home'))
+    #getting current configuration from session, even_preferences set as default
+    configuration = session.get('configuration', 'even_preferences') 
     
-    # If form validation fails, render the form template with error messages
-    # Pass the form object to the template to display error messages next to the fields
-    else:
-        return render_template('studentform.html', title='Students: Course Selection', form=form)
-   
+    #passing current configuration to studentform
+    form = StudentForm(configuration=configuration)
 
-'''
-#Route for Supervisor page
-@app.route("/supervisorform", methods=['GET', 'POST'])
-def supervisorform():
-    form = SupervisorForm()
     if form.validate_on_submit():
-        selection = SupervisorStudentRanking(
-            supervisor=form.supervisor.data,
-            course=form.course.data,
-            first_student_choice=form.first_student_choice.data,
-            second_student_choice=form.second_student_choice.data,
-            third_student_choice=form.third_student_choice.data, 
-            fourth_student_choice=form.fourth_student_choice.data,
-            fifth_student_choice=form.fifth_student_choice.data
-        )
-        db.session.add(selection)
-        db.session.commit()
-        flash('Thank you! Your course selection has been submitted. Your final student allocation will be published shortly.')
-        return redirect(url_for('home'))
-    
-      # If form validation fails, render the form template with error messages
-    # Pass the form object to the template to display error messages next to the fields
-    else:
-        return render_template('supervisorform.html', title='Supervisors: Student Ranking', form=form)
-'''
+        try:
+
+            #creating new student if not yet in db
+            student = Student.query.filter_by(student_number=form.student_number.data).first()
+            if not student:
+                student = Student(name=form.name.data, student_number=form.student_number.data)
+                db.session.add(student)
+            
+            #creating new course choice if not yet in db
+            student_course_choice = StudentCourseChoice.query.filter_by(student_number=form.student_number.data).first()
+            if not student_course_choice:
+                student_course_choice = StudentCourseChoice(student_number=form.student_number.data)
+                db.session.add(student_course_choice)
+
+            #loops over course choices since nr of fields can vary based on dynamic adjustment
+            for field_name in form:
+                if 'course_choice' in field_name.name:
+                    setattr(student_course_choice, field_name.name, field_name.data)
+
+            db.session.commit()
+            flash('Thank you! Your course selection has been submitted. Your final course allocation will be published shortly.')
+            return redirect(url_for('home'))
+        
+        #error handling based on form validation 
+        except Exception as e:
+            flash(f'An error occurred: {str(e)}', 'error')
+
+    return render_template('studentform.html', form=form, title='Student Form')
+
 
 
 @app.route('/supervisorform', methods=['GET', 'POST'])
 def supervisorform():
-    form = SupervisorForm()
+
+    #getting current configuration from session, even_preferences set as default
+    configuration = session.get('configuration', 'even_preferences')
+
+    #passing current configuration to supervisorform
+    form = SupervisorForm(configuration=configuration)
+
     if form.validate_on_submit():
+        try:
+            #creating new SupervisorStudentRanking entry if not yet in db
+            supervisor_ranking = SupervisorStudentRanking.query.filter_by(
+                supervisor=form.supervisor.data, course=form.course.data).first()
+            if not supervisor_ranking:
+                supervisor_ranking = SupervisorStudentRanking(
+                    supervisor=form.supervisor.data,
+                    course=form.course.data)
+                db.session.add(supervisor_ranking)
 
-        #Attempting to find existing supervisor --> TO DO: check if this can be implemented more efficiently
-        existing_supervisor = SupervisorStudentRanking.query.filter_by(supervisor=form.supervisor.data).first()
-        if existing_supervisor:
+            #Update student choices based on configuration (technically the same in all configurations but want to avoic hardcoding)
+            for field_name in ['first_student_choice', 'second_student_choice',
+                               'third_student_choice', 'fourth_student_choice', 'fifth_student_choice']:
+                if hasattr(form, field_name):
+                    setattr(supervisor_ranking, field_name, getattr(form, field_name).data)
 
-            #Update existing supervisor details
-            existing_supervisor.course = form.course.data
-            existing_supervisor.first_student_choice = form.first_student_choice.data
-            existing_supervisor.second_student_choice = form.second_student_choice.data
-            existing_supervisor.third_student_choice = form.third_student_choice.data
-            existing_supervisor.fourth_student_choice = form.fourth_student_choice.data
-            existing_supervisor.fifth_student_choice = form.fifth_student_choice.data
-            existing_supervisor.capacity = form.capacity.data
-        else:
-            #Creating new supervisor record if it does not exist yet
-            new_supervisor = SupervisorStudentRanking(
-                supervisor=form.supervisor.data,
-                course=form.course.data,
-                first_student_choice=form.first_student_choice.data,
-                second_student_choice=form.second_student_choice.data,
-                third_student_choice=form.third_student_choice.data,
-                fourth_student_choice=form.fourth_student_choice.data,
-                fifth_student_choice=form.fifth_student_choice.data,
-                capacity=form.capacity.data
-            )
-            db.session.add(new_supervisor)
-        
-        db.session.commit()
-        flash('Thank you! Your ranking has been submitted. Your final student allocation will be published shortly.')
-        return redirect(url_for('home'))
-    
-    else:
-        # Render the form template with error messages
-        return render_template('supervisorform.html', title='Supervisors: Student Ranking', form=form)
+            #Updating capacity field if configuration set to limited capacity
+            if configuration == 'limited_capacity' and hasattr(form, 'capacity'):
+                supervisor_ranking.capacity = form.capacity.data
+
+            db.session.commit()
+            flash('Thank you! Your course selection has been submitted. Your final student allocation will be published shortly.')
+            return redirect(url_for('home'))
+        except Exception as e:
+            flash(f'An error occurred: {str(e)}', 'error')
+           
+
+    return render_template('supervisorform.html', form=form, title='Supervisor Ranking Form')
 
 
 
-#run Matching and return output as table
+#Matching route + returning output as table
 @app.route('/match', methods=['GET', 'POST'])
 def match():
     if request.method == 'POST':
-        # Clearing old matches
+
+        #Clearing old matches
         Match.query.delete()
         db.session.commit()
 
-        # Performing matching process
+        #matching process (configuration defined in GS.py)
         matches = perform_matching()
 
-        # Creating new Match objects for each pairing
+        #creating new Match objects 
         for supervisor_ranking_id, student_number in matches.items():
             new_match = Match(student_number=student_number, supervisor_ranking_id=supervisor_ranking_id)
             db.session.add(new_match)
@@ -146,10 +119,10 @@ def match():
 
         flash('Matching process completed successfully.')
 
-        # Reloading page to view match list
+        #reloading page to view match list
         return redirect(url_for('match'))
 
-    # Fetching all matches and join with other tables for detailed information in output
+    #fetching all matches and joining with other tables for more detailled output
     all_matches = db.session.query(
         Match,
         StudentCourseChoice.name.label('student_name'),
@@ -161,10 +134,10 @@ def match():
         SupervisorStudentRanking, SupervisorStudentRanking.id == Match.supervisor_ranking_id
     ).all()
 
-    # Including course titles
+    #including course titles
     detailed_matches = []
     for match, student_name, course_number, supervisor_name in all_matches:
-        # Getting course name from the database
+      
         course = Course.query.get(course_number)
         if course:
             course_title = course.name
@@ -182,26 +155,21 @@ def match():
 
     return render_template('match.html', matches=detailed_matches)
 
-#Admin Route to choose scenarios
+
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
-    form = ConfigForm()
+    form = ConfigForm(request.form)
+    if request.method == 'POST' and form.validate():
 
-    if request.method == 'POST' and form.validate_on_submit():
-        # Retrieve the configuration item for 'active_scenario'
-        config = Configuration.query.filter_by(key='active_scenario').first()
-        if config:
-            # Update the value with the one selected in the form
-            config.value = form.configuration.data
-            db.session.commit()
-            flash('Configuration updated successfully.')
-        else:
-            # Optionally, create a new configuration record if it doesn't exist
-            new_config = Configuration(key='active_scenario', value=form.configuration.data)
-            db.session.add(new_config)
-            db.session.commit()
-            flash('New configuration setting created successfully.')
-        
-        return redirect(url_for('admin'))
+        #storing configuration in session 
+        session['configuration'] = form.configuration.data  
 
+        return redirect(url_for('admin'))  
     return render_template('admin.html', form=form)
+
+
+#Displaying selected scenario (this is not working atm, the query should be correct though)
+@app.context_processor
+def inject_configuration():
+    current_config = Configuration.query.filter_by(key='configuration').first()
+    return {'configuration': current_config}

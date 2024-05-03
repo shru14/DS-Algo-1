@@ -1,11 +1,12 @@
 {% extends "layout.html" %}
 {% block content %}
 <h1>{{ title }}</h1>
+<p>Current configuration: {{ current_configuration }}</p>  {# Use current_configuration instead of configuration #}
 <form method="post">
-    {{ form.hidden_tag() }} <!-- CSRF protection token -->
+    {{ form.hidden_tag() }} 
     <div>
         {{ form.name.label }}<br>
-        {{ form.name(size=32) }} <!-- Adjust size as needed -->
+        {{ form.name(size=32) }} 
         {% for error in form.name.errors %}
             <span style="color: red;">{{ error }}</span><br>
         {% endfor %}
@@ -17,16 +18,34 @@
             <span style="color: red;">{{ error }}</span><br>
         {% endfor %}
     </div>
-    <!-- Dynamically populated course choices -->
-    {% for field in [form.first_course_choice, form.second_course_choice, form.third_course_choice, form.fourth_course_choice, form.fifth_course_choice] %}
-    <div>
-        {{ field.label }}<br>
-        {{ field() }}
-        {% for error in field.errors %}
-            <span style="color: red;">{{ error }}</span><br>
-        {% endfor %}
-    </div>
+
+    <!-- Dynamic adjustment: Changing course choices based on selected scenario -->
+    {% if current_configuration == 'even_preferences' %}  {# Use current_configuration instead of configuration #}
+    {% for field in form if 'course_choice' in field.name %}
+        <div>
+            {{ field.label }}<br>
+            {{ field() }}
+            {% for error in field.errors %}
+                <span style="color: red;">{{ error }}</span><br>
+            {% endfor %}
+        </div>
     {% endfor %}
+{% else %}
+    {% for field in form if 'course_choice' in field.name %}
+
+    <!-- Displaying only the first three course choices -->
+        {% if loop.index <= 3 %}  
+            <div>
+                {{ field.label }}<br>
+                {{ field() }}
+                {% for error in field.errors %}
+                    <span style="color: red;">{{ error }}</span><br>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
     <div class="form-group">
         {{ form.submit(class="btn btn-primary mt-3") }}
     </div>
