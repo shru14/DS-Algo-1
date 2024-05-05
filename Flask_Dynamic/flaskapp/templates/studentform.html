@@ -1,69 +1,71 @@
 {% extends "layout.html" %}
 
 {% block content %}
-    <h1>{{ title }}</h1>
-    <form method="post">
-        {{ form.hidden_tag() }}
+    <div style="max-width: 500px; margin: 0 auto;">
+        <h1 style="text-align: center; font-weight: bold; font-size: 1.5em; margin-bottom: 20px;">{{ title }}</h1>
+        <form method="post">
+            {{ form.hidden_tag() }}
 
-        <div>
-            {{ form.name.label }}<br>
-            {{ form.name(class="form-control") }}
-            {% for error in form.name.errors %}
-                <span style="color: red;">{{ error }}</span><br>
-            {% endfor %}
-        </div>
+            <div>
+                {{ form.name.label }}<br>
+                {{ form.name(class="form-control") }}
+                {% for error in form.name.errors %}
+                    <span style="color: red;">{{ error }}</span><br>
+                {% endfor %}
+            </div>
 
-        <div>
-            {{ form.student_number.label }}<br>
-            {{ form.student_number(class="form-control") }}
-            {% for error in form.student_number.errors %}
-                <span style="color: red;">{{ error }}</span><br>
-            {% endfor %}
-        </div>
+            <div>
+                {{ form.student_number.label }}<br>
+                {{ form.student_number(class="form-control") }}
+                {% for error in form.student_number.errors %}
+                    <span style="color: red;">{{ error }}</span><br>
+                {% endfor %}
+            </div>
 
-        <div>
-            {{ form.first_course_choice.label }}<br>
-            {{ form.first_course_choice(class="form-control") }}
-            {% for error in form.first_course_choice.errors %}
-                <span style="color: red;">{{ error }}</span><br>
-            {% endfor %}
-        </div>
+            <div>
+                {{ form.first_course_choice.label }}<br>
+                {{ form.first_course_choice(class="form-control") }}
+                {% for error in form.first_course_choice.errors %}
+                    <span style="color: red;">{{ error }}</span><br>
+                {% endfor %}
+            </div>
 
-        <div>
-            {{ form.second_course_choice.label }}<br>
-            {{ form.second_course_choice(class="form-control") }}
-            {% for error in form.second_course_choice.errors %}
-                <span style="color: red;">{{ error }}</span><br>
-            {% endfor %}
-        </div>
+            <div>
+                {{ form.second_course_choice.label }}<br>
+                {{ form.second_course_choice(class="form-control") }}
+                {% for error in form.second_course_choice.errors %}
+                    <span style="color: red;">{{ error }}</span><br>
+                {% endfor %}
+            </div>
 
-        <div>
-            {{ form.third_course_choice.label }}<br>
-            {{ form.third_course_choice(class="form-control") }}
-            {% for error in form.third_course_choice.errors %}
-                <span style="color: red;">{{ error }}</span><br>
-            {% endfor %}
-        </div>
+            <div>
+                {{ form.third_course_choice.label }}<br>
+                {{ form.third_course_choice(class="form-control") }}
+                {% for error in form.third_course_choice.errors %}
+                    <span style="color: red;">{{ error }}</span><br>
+                {% endfor %}
+            </div>
 
-        {% if active_config == 'even_preferences' %}
-        <div>
-            {{ form.fourth_course_choice.label }}<br>
-            {{ form.fourth_course_choice(class="form-control") }}
-            {% for error in form.fourth_course_choice.errors %}
-                <span style="color: red;">{{ error }}</span><br>
-            {% endfor %}
-        </div>
-        <div>
-            {{ form.fifth_course_choice.label }}<br>
-            {{ form.fifth_course_choice(class="form-control") }}
-            {% for error in form.fifth_course_choice.errors %}
-                <span style="color: red;">{{ error }}</span><br>
-            {% endfor %}
-        </div>
-        {% endif %}
+            {% if active_config == 'even_preferences' %}
+            <div>
+                {{ form.fourth_course_choice.label }}<br>
+                {{ form.fourth_course_choice(class="form-control") }}
+                {% for error in form.fourth_course_choice.errors %}
+                    <span style="color: red;">{{ error }}</span><br>
+                {% endfor %}
+            </div>
+            <div>
+                {{ form.fifth_course_choice.label }}<br>
+                {{ form.fifth_course_choice(class="form-control") }}
+                {% for error in form.fifth_course_choice.errors %}
+                    <span style="color: red;">{{ error }}</span><br>
+                {% endfor %}
+            </div>
+            {% endif %}
 
-        <div class="form-group">
-            {{ form.submit(class="btn btn-primary mt-3") }}
-        </div>
-    </form>
+            <div class="form-group" style="text-align: center;">
+                {{ form.submit(class="btn btn-primary mt-3") }}
+            </div>
+        </form>
+    </div>
 {% endblock %}

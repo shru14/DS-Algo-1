@@ -1,71 +1,72 @@
-<!-- Update supervisorform.html -->
 {% extends "layout.html" %}
 {% block content %}
-    <h1>{{ title }}</h1>
-    <form method="post">
-        {{ form.hidden_tag() }}
-        <div>
-            {{ form.supervisor.label }}<br>
-            {{ form.supervisor(class="form-control") }}
-            {% for error in form.supervisor.errors %}
-                <span style="color: red;">{{ error }}</span><br>
-            {% endfor %}
-        </div>
-        <div>
-            {{ form.course.label }}<br>
-            {{ form.course(class="form-control") }}
-            {% for error in form.course.errors %}
-                <span style="color: red;">{{ error }}</span><br>
-            {% endfor %}
-        </div>
-        <!-- Additional capacity field for limited capacities -->
-        {% if active_config == 'limited_capacities' %}
-        <div>
-            {{ form.capacity.label }}<br>
-            {{ form.capacity(class="form-control") }}
-            {% for error in form.capacity.errors %}
-                <span style="color: red;">{{ error }}</span><br>
-            {% endfor %}
-        </div>
-        {% endif %}
-        <!-- Remaining student choice fields -->
-        <div>
-            {{ form.first_student_choice.label }}<br>
-            {{ form.first_student_choice(class="form-control") }}
-            {% for error in form.first_student_choice.errors %}
-                <span style="color: red;">{{ error }}</span><br>
-            {% endfor %}
-        </div>
-        <div>
-            {{ form.second_student_choice.label }}<br>
-            {{ form.second_student_choice(class="form-control") }}
-            {% for error in form.second_student_choice.errors %}
-                <span style="color: red;">{{ error }}</span><br>
-            {% endfor %}
-        </div>
-        <div>
-            {{ form.third_student_choice.label }}<br>
-            {{ form.third_student_choice(class="form-control") }}
-            {% for error in form.third_student_choice.errors %}
-                <span style="color: red;">{{ error }}</span><br>
-            {% endfor %}
-        </div>
-        <div>
-            {{ form.fourth_student_choice.label }}<br>
-            {{ form.fourth_student_choice(class="form-control") }}
-            {% for error in form.fourth_student_choice.errors %}
-                <span style="color: red;">{{ error }}</span><br>
-            {% endfor %}
-        </div>
-        <div>
-            {{ form.fifth_student_choice.label }}<br>
-            {{ form.fifth_student_choice(class="form-control") }}
-            {% for error in form.fifth_student_choice.errors %}
-                <span style="color: red;">{{ error }}</span><br>
-            {% endfor %}
-        </div>
-        <div class="form-group">
-            {{ form.submit(class="btn btn-primary mt-3") }}
-        </div>
-    </form>
+    <div style="max-width: 500px; margin: 0 auto;">
+        <h1 style="text-align: center; font-weight: bold; font-size: 1.5em; margin-bottom: 20px;">{{ title }}</h1>
+        <form method="post">
+            {{ form.hidden_tag() }}
+            <div>
+                {{ form.supervisor.label }}<br>
+                {{ form.supervisor(class="form-control") }}
+                {% for error in form.supervisor.errors %}
+                    <span style="color: red;">{{ error }}</span><br>
+                {% endfor %}
+            </div>
+            <div>
+                {{ form.course.label }}<br>
+                {{ form.course(class="form-control") }}
+                {% for error in form.course.errors %}
+                    <span style="color: red;">{{ error }}</span><br>
+                {% endfor %}
+            </div>
+            <!-- Additional capacity field for limited capacities -->
+            {% if active_config == 'limited_capacities' %}
+            <div>
+                {{ form.capacity.label }}<br>
+                {{ form.capacity(class="form-control") }}
+                {% for error in form.capacity.errors %}
+                    <span style="color: red;">{{ error }}</span><br>
+                {% endfor %}
+            </div>
+            {% endif %}
+            <!-- Remaining student choice fields -->
+            <div>
+                {{ form.first_student_choice.label }}<br>
+                {{ form.first_student_choice(class="form-control") }}
+                {% for error in form.first_student_choice.errors %}
+                    <span style="color: red;">{{ error }}</span><br>
+                {% endfor %}
+            </div>
+            <div>
+                {{ form.second_student_choice.label }}<br>
+                {{ form.second_student_choice(class="form-control") }}
+                {% for error in form.second_student_choice.errors %}
+                    <span style="color: red;">{{ error }}</span><br>
+                {% endfor %}
+            </div>
+            <div>
+                {{ form.third_student_choice.label }}<br>
+                {{ form.third_student_choice(class="form-control") }}
+                {% for error in form.third_student_choice.errors %}
+                    <span style="color: red;">{{ error }}</span><br>
+                {% endfor %}
+            </div>
+            <div>
+                {{ form.fourth_student_choice.label }}<br>
+                {{ form.fourth_student_choice(class="form-control") }}
+                {% for error in form.fourth_student_choice.errors %}
+                    <span style="color: red;">{{ error }}</span><br>
+                {% endfor %}
+            </div>
+            <div>
+                {{ form.fifth_student_choice.label }}<br>
+                {{ form.fifth_student_choice(class="form-control") }}
+                {% for error in form.fifth_student_choice.errors %}
+                    <span style="color: red;">{{ error }}</span><br>
+                {% endfor %}
+            </div>
+            <div class="form-group" style="text-align: center;">
+                {{ form.submit(class="btn btn-primary mt-3") }}
+            </div>
+        </form>
+    </div>
 {% endblock %}

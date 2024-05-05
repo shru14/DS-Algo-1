@@ -1,22 +1,22 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class="container mt-5">
-    <h2>Matching Results</h2>
-    
+    <h2 style="text-align: center; font-weight: bold; font-size: 1.5em; margin-bottom: 20px;">Matching Results</h2>
+
     <!-- Button to trigger matching process -->
-    <form action="{{ url_for('match') }}" method="post">
-        <button type="submit" class="btn btn-primary mb-3">Start Matching Process</button>
+    <form action="{{ url_for('match') }}" method="post" style="text-align: center;">
+        <button type="submit" class="btn btn-primary mb-3" style="background-color: #010057; font-weight: normal; border: none;">Start Matching Process</button>
     </form>
-    
+
     <!-- Table to display matches -->
-    <table class="table table-striped table-hover">
-        <thead class="thead-dark">
+    <table class="table table-striped table-hover" style="text-align: center;">
+        <thead class="thead-light" style="font-size: 0.9em;">
             <tr>
-                <th>Match ID</th>
-                <th>Student Name</th>
-                <th>Student Number</th>
-                <th>Course Number</th>
-                <th>Supervisor Name</th>
+                <th style="font-weight: normal;">Match ID</th>
+                <th style="font-weight: normal;">Student Name</th>
+                <th style="font-weight: normal;">Student Number</th>
+                <th style="font-weight: normal;">Course Number</th>
+                <th style="font-weight: normal;">Supervisor Name</th>
             </tr>
         </thead>
         <tbody>
