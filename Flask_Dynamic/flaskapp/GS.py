@@ -128,6 +128,9 @@ def gs_even(student_preferences, supervisor_preferences):
 #Configuration 2: Limited Capacities
 #Added print statements for debugging
 def gs_capacity(student_preferences, supervisor_preferences, supervisor_capacities):
+    # Convert supervisor preference IDs to integers for consistency
+    supervisor_preferences = {k: [int(id) for id in v] for k, v in supervisor_preferences.items()}
+
     matches = {}  # Initialize dictionary to store matches
     supervisor_matches = {supervisor: [] for supervisor in supervisor_preferences}
     unmatched_students = set(student_preferences.keys())
