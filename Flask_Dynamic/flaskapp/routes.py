@@ -11,6 +11,7 @@ from flaskapp.models import Configuration
 from flaskapp.admin import ConfigForm
 from wtforms import SelectField, StringField
 from flaskapp.init_scenario import get_active_configuration
+from flaskapp.admin import ConfigForm  
 
 # Route for the home page, which is where the blog posts will be shown
 @app.route("/")
@@ -146,18 +147,27 @@ def match():
     return render_template('match.html', matches=detailed_matches, active_config=active_config, num_matches=len(all_matches))
 
 
-#Admin Route to choose scenarios
+#Admin Route 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
     form = ConfigForm()
     if request.method == 'POST' and form.validate_on_submit():
-        # Retrieve or create the active configuration setting
+
+        # Retrieving active configuration
         config = Configuration.query.filter_by(key='active_configuration').first()
         if not config:
             config = Configuration(key='active_configuration')
             db.session.add(config)
+
+        # Clearing relevant tables before updating the configuration
+        if config.value != form.configuration.data:  # Check if configuration actually changes
+            db.session.query(StudentCourseChoice).delete()
+            db.session.query(SupervisorStudentRanking).delete()
+            db.session.query(Match).delete()
+
+            db.session.commit()  
         
-        # Update the configuration value
+        # Updating configuration
         config.value = form.configuration.data
         db.session.commit()
 
