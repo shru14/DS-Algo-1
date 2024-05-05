@@ -5,36 +5,102 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+    <!-- Adding custom CSS -->
+    <style>
+        .logo-img {
+            width: 25%; /* Set image width to 20% */
+            display: block; /* Ensure the image is a block element */
+            margin: 0 auto; /* Center the image horizontally */
+            margin-bottom: 20px; /* Add margin under the logo */
+            margin-top: 15px; /* Add margin above the logo */
+        }
+
+        .menu {
+            text-align: center; /* Center align the menu items */
+            margin-bottom: 0; /* Remove default margin */
+            padding-bottom: 10px; /* Add padding to separate the line */
+        }
+
+        .menu li {
+            display: inline-block; /* Display menu items in a line */
+            margin-right: 10px; /* Add some spacing between menu items */
+        }
+
+        .menu li a {
+            color: black; /* Set menu item font color to black */
+            background-color: transparent; /* Set menu item background color to transparent */
+            text-decoration: none; /* Remove underline from menu items */
+            padding: 5px 10px; /* Add padding to menu items */
+        }
+
+        .menu li a:hover {
+            color: #C1233E; /* Change font color on hover */
+        }
+
+        .logo-container {
+            text-align: center; /* Center align the logo */
+            position: relative; /* Enable positioning for the line */
+        }
+
+        .header-line {
+            position: absolute; /* Position the line */
+            bottom: 0; /* Align the line to the bottom of the container */
+            left: 0; /* Align the line to the left of the container */
+            width: 100%; /* Set the width to span the entire container */
+            border-bottom: 3px solid #C1233E; /* Change the border color to #C1233E */
+        }
+
+        header {
+            background-color: transparent; /* Remove background color from header */
+        }
+
+        footer {
+            text-align: center; /* Center align the text */
+            margin-top: 20px; /* Add some margin at the top */
+            color: #666; /* Set font color to gray */
+            font-size: 0.75em; /* Set smaller font size */
+        }
+    </style>
 </head>
 <body>
 <header>
     <div id="container">
-        <h1 class="logo">University Course Selection</h1>
-        <strong>
-            <nav>
-                <ul class="menu">
-                    <li><a href="{{ url_for('home') }}">Home</a></li>
-                    <li><a href="{{ url_for('studentform') }}">Students: Course Selection</a></li>
-                    <li><a href="{{ url_for('supervisorform') }}">Supervisors: Student Ranking</a></li>
-                    <li><a href="{{ url_for('match') }}">Find your Course</a></li>
-                    <li><a href="{{ url_for('admin') }}">Admin</a></li>
-                </ul>
-            </nav>
-        </strong>
+        <!-- Logo and menu on the same line -->
+        <div class="logo-container">
+            <!-- Logo -->
+            <img src="{{ url_for('static', filename='Hertie_School_of_Governance_logo.svg') }}" alt="University Logo" class="logo-img">
+            <!-- Menu -->
+            <strong>
+                <nav>
+                    <ul class="menu">
+                        <li><a href="{{ url_for('home') }}">Home</a></li>
+                        <li><a href="{{ url_for('studentform') }}">Students</a></li>
+                        <li><a href="{{ url_for('supervisorform') }}">Supervisors</a></li>
+                        <li><a href="{{ url_for('match') }}">Find your course</a></li>
+                        <li><a href="{{ url_for('admin') }}">Admin</a></li>
+                    </ul>
+                </nav>
+            </strong>
+            <!-- Red line -->
+            <div class="header-line"></div>
+        </div>
     </div>
 </header>
 <div class="container">
-      {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="alert alert-{{ category }}">
-              {{ message }}
-          </div>
-        {% endfor %}
-      {% endif %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
     {% endwith %}
     {% block content %}
     {% endblock %}
 </div>
+<footer>
+    <p>This page was designed by students from the Master of Data Science for Public Policy at Hertie School for the Data Structures & Algorithms taught by Prof. Drew Dimmery. Berlin, DE, 2024.</p>
+</footer>
 </body>
 </html>
