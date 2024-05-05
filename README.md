@@ -3,7 +3,7 @@
 #### Spring Semester 2024 - Data Structures & Algorithms final project - Master of Data Science for Public Policy
   
   
-Folders:
+Folders: 
 
 1. Code
 1.1 algo_stuff  
