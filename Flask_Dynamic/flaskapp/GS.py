@@ -101,6 +101,7 @@ def perform_matching():
 
 #Configuration 1: GS for Even Preferences
 def gs_even(student_preferences, supervisor_preferences):
+    supervisor_preferences = {k: [int(id) for id in v] for k, v in supervisor_preferences.items()}    
     matches = {} # Initiate dictionary that in the returns all stable matches. Initiated as empty, since we don't have any yet.
     
     free_students = list(student_preferences.keys()) # Initiate the student as free. Returns the keys from matching dictionary and transforms to list. 
