@@ -63,45 +63,52 @@ def get_supervisor_capacities():
 
 #choosing GS implementation according to selected configuration
 def perform_matching():
-    # Fetching the current active configuration
-    active_config = get_active_configuration()
-    print("Active configuration:", active_config)
+    try:
+        # Fetching the current active configuration
+        active_config = get_active_configuration()
+        print("Active configuration:", active_config)
 
-    # Fetching preferences
-    student_preferences = get_student_preferences()
-    supervisor_preferences = get_supervisor_preferences()
+        # Fetching preferences
+        student_preferences = get_student_preferences()
+        supervisor_preferences = get_supervisor_preferences()
 
-    # Initialize capacities dictionary
-    supervisor_capacities = {}
+        # Initialize capacities dictionary
+        supervisor_capacities = {}
 
-    # Fetching capacities if necessary
-    #included print statement for debugging and validation
-    if active_config == 'limited_capacities':
-        supervisor_capacities = get_supervisor_capacities()
-        print("Supervisor capacities:", supervisor_capacities)
+        # Fetching capacities if necessary
+        #included print statement for debugging and validation
+        if active_config == 'limited_capacities':
+            supervisor_capacities = get_supervisor_capacities()
+            print("Supervisor capacities:", supervisor_capacities)
 
-    if active_config == 'even_preferences':
-        print("Calling gs_even function...")
-        matches = gs_even(student_preferences, supervisor_preferences)
-    elif active_config == 'limited_capacities':
-        print("Calling gs_capacity function...")
-        matches = gs_capacity(student_preferences, supervisor_preferences, supervisor_capacities)
-    elif active_config == 'uneven_preferences':
-        print("Calling gs_uneven function...")
-        matches = gs_uneven(student_preferences, supervisor_preferences)
-    else:
-        # Handling the case where the configuration is not recognized
-        matches = {}
-    
-    print("Matching completed.")
-    return matches if isinstance(matches, dict) else {}
+        if active_config == 'even_preferences':
+            print("Calling gs_even function...")
+            matches = gs_even(student_preferences, supervisor_preferences)
+        elif active_config == 'limited_capacities':
+            print("Calling gs_capacity function...")
+            matches = gs_capacity(student_preferences, supervisor_preferences, supervisor_capacities)
+        elif active_config == 'uneven_preferences':
+            print("Calling gs_uneven function...")
+            matches = gs_uneven(student_preferences, supervisor_preferences)
+        else:
+            # Handling the case where the configuration is not recognized
+            matches = {}
+
+        print("Matching completed.")
+        return matches, None
+    except KeyError as e:
+        error_msg = f"Matching error: Missing data for supervisor ID {e.args[0]}. Not all supervisors have submitted preferences."
+        print(error_msg)
+        return {}, error_msg  # Return empty matches and the error message
 
 
 
 
 #Configuration 1: GS for Even Preferences
 def gs_even(student_preferences, supervisor_preferences):
-    supervisor_preferences = {k: [int(id) for id in v] for k, v in supervisor_preferences.items()}    
+
+    supervisor_preferences = {k: [int(id) for id in v] for k, v in supervisor_preferences.items()}
+
     matches = {} # Initiate dictionary that in the returns all stable matches. Initiated as empty, since we don't have any yet.
     
     free_students = list(student_preferences.keys()) # Initiate the student as free. Returns the keys from matching dictionary and transforms to list. 

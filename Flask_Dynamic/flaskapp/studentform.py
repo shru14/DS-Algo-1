@@ -71,6 +71,12 @@ class StudentForm(FlaskForm):
             self.first_course_choice.errors.append("Each course can only be picked once.")
             return False
 
+        # Allowed student numbers
+        allowed_student_numbers = ['10001', '10002', '10003', '10004', '10005']
+        if self.student_number.data not in allowed_student_numbers:
+            self.student_number.errors.append('Invalid student number. Please enter a valid student number')
+            return False
+
         if StudentCourseChoice.query.filter_by(student_number=self.student_number.data).first():
             self.student_number.errors.append('This student number is already registered in StudentCourseChoice.')
             return False
