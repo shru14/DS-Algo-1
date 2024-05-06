@@ -5,6 +5,7 @@ from app.models import Configuration
 #Creating instance of different configurations 
 def init_configurations():
     configs = [
+        Configuration(key='active_configuration', value='even_preferences'),
         Configuration(key='even_preferences', value='1'),
         Configuration(key='limited_capacities', value='2'),  
         Configuration(key='uneven_preferences', value='3') 
