@@ -1,15 +1,15 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, SubmitField, SelectField
 from wtforms.validators import DataRequired, ValidationError, NumberRange, Optional
-from flaskapp.models import Course, Student
-from flaskapp.extensions import db
-from flaskapp.init_scenario import get_active_configuration
+from app.models import Course, Student
+from app.extensions import db
+from app.init_scenario import get_active_configuration
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField
 from wtforms.validators import DataRequired, Optional, ValidationError
-from flaskapp.models import Course, Student, StudentCourseChoice
-from flaskapp.init_scenario import get_active_configuration
+from app.models import Course, Student, StudentCourseChoice
+from app.init_scenario import get_active_configuration
 
 class StudentForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])

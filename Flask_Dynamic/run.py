@@ -1,4 +1,4 @@
-from flaskapp import create_app
+from app import create_app
 
 #Entry point to run flask app
 app = create_app()
