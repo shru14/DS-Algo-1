@@ -105,15 +105,21 @@ def match():
         db.session.commit()
 
         # Perform matching process
-        matches = perform_matching()
+        matches, error = perform_matching()  # Expecting two return values
+
+        if error:
+            flash(f'Error during matching: {error}', 'error')
+            return redirect(url_for('match'))
 
         # Create new match objects for each pairing
-        for student_number, supervisor_ranking_id in matches.items():
-            new_match = Match(student_number=student_number, supervisor_ranking_id=supervisor_ranking_id)
-            db.session.add(new_match)
-        db.session.commit()
-
-        flash('Matching process completed successfully.')
+        if isinstance(matches, dict):
+            for student_number, supervisor_ranking_id in matches.items():
+                new_match = Match(student_number=student_number, supervisor_ranking_id=supervisor_ranking_id)
+                db.session.add(new_match)
+            db.session.commit()
+            flash('Matching process completed successfully.')
+        else:
+            flash('Matching failed due to unexpected return type.', 'error')
 
         # Reload page to view match list
         return redirect(url_for('match'))
