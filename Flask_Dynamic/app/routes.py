@@ -46,12 +46,14 @@ def studentform():
         return redirect(url_for('studentform'))
     
     else:
+
+        #for error handling + debugging
         print("Form errors:", form.errors)
         for fieldName, errorMessages in form.errors.items():
             for err in errorMessages:
                 print(f"Error in {fieldName}: {err}")
 
-    # If form validation fails or it's a GET request, render the form template
+    
     return render_template('studentform.html', title='Students: Course Selection', form=form, active_config=form.active_config)
    
 
@@ -86,9 +88,15 @@ def supervisorform():
         return redirect(url_for('supervisorform'))
     
       # If form validation fails, render the form template with error messages
-    # Pass the form object to the template to display error messages next to the fields
     else:
-        return render_template('supervisorform.html', title='Supervisors: Student Ranking', form=form, active_config=form.active_config)
+
+        #for error handling + debugging
+        print("Form errors:", form.errors)
+        for fieldName, errorMessages in form.errors.items():
+            for err in errorMessages:
+                print(f"Error in {fieldName}: {err}")
+
+    return render_template('supervisorform.html', title='Supervisors: Student Ranking', form=form, active_config=form.active_config)
 
 
 
@@ -162,8 +170,15 @@ def admin():
         # Retrieving active configuration
         config = Configuration.query.filter_by(key='active_configuration').first()
         if not config:
-            config = Configuration(key='active_configuration')
-            db.session.add(config)
+            # Set a default active configuration if not found
+            default_config = Configuration.query.filter_by(key='even_preferences').first()
+            if default_config:
+                config = Configuration(key='active_configuration', value=default_config.value)
+                db.session.add(config)
+                db.session.commit()
+            else:
+                flash('Error: Default configuration not found.')
+                return redirect(url_for('admin'))  # Redirect to admin page with error message
 
         # Clearing relevant tables before updating the configuration
         if config.value != form.configuration.data:  # Check if configuration actually changes
