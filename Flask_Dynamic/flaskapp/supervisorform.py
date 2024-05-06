@@ -17,21 +17,27 @@ class SupervisorForm(FlaskForm):
     capacity = SelectField('Capacity', choices=[(1, '1'), (2, '2'), (3, '3')], validators=[Optional()])
     submit = SubmitField('Submit')
 
-    #fetching choices from SQLite db 
+    #fetching inputs for form drop downs from db
     def __init__(self, *args, **kwargs):
         super(SupervisorForm, self).__init__(*args, **kwargs)
         self.active_config = get_active_configuration()
 
-        #populating course choices to drop down 
-        self.course.choices = [(course.id, course.name) for course in Course.query.all()]
+        #fetching entire course list from db
+        all_courses = [(course.id, course.name) for course in Course.query.all()]
 
-        #populating students from db to drop down 
-        self.first_student_choice.choices = [(student.student_number, f"{student.student_number} - {student.name}") for student in Student.query.all()]
-        self.second_student_choice.choices = [(student.student_number, f"{student.student_number} - {student.name}") for student in Student.query.all()]
-        self.third_student_choice.choices = [(student.student_number, f"{student.student_number} - {student.name}") for student in Student.query.all()]
-        self.fourth_student_choice.choices = [(student.student_number, f"{student.student_number} - {student.name}") for student in Student.query.all()]
-        self.fifth_student_choice.choices = [(student.student_number, f"{student.student_number} - {student.name}") for student in Student.query.all()]
+        #Limiting course list if config: limited_capacities or uneven_preferences
+        if self.active_config in ['limited_capacities', 'uneven_preferences']:
+            limited_courses = all_courses[:3]  # Only the first three courses
+            self.course.choices = limited_courses
+        else:
+            self.course.choices = all_courses
 
+        #populating students to drop down 
+        all_students = [(student.student_number, f"{student.student_number} - {student.name}") for student in Student.query.all()]
+        for field in [self.first_student_choice, self.second_student_choice, self.third_student_choice, self.fourth_student_choice, self.fifth_student_choice]:
+            field.choices = all_students
+
+        #activating capacities field for config:limited capacities
         if self.active_config == 'limited_capacities':
             self.capacity.validators = [DataRequired()]
         else:
@@ -56,7 +62,7 @@ class SupervisorForm(FlaskForm):
 
                 raise ValidationError('Please fill in all the necessary fields.')
 
-            # Checking for duplicate student choices
+            #Checking for duplicate student choices
             chosen_students = [
                 self.first_student_choice.data,
                 self.second_student_choice.data,
