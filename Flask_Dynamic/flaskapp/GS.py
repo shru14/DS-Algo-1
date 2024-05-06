@@ -60,6 +60,16 @@ def get_supervisor_capacities():
     return capacities
 
 
+#function needed to standardize internal storing logic in Match db
+def finalize_matches(supervisor_matches):
+
+    matches = {}
+    for supervisor, students in supervisor_matches.items():
+        for student in students:
+            matches[student] = supervisor  
+    return matches
+
+
 
 #choosing GS implementation according to selected configuration
 def perform_matching():
@@ -108,8 +118,8 @@ def gs_even(student_preferences, supervisor_preferences):
     
     while free_students: 
         student = free_students.pop(0) # .pop takes and removes the student at index 0 from the free students list. Assign to student, this equals S in the lecture.
-        supervisor = student_preferences[student].pop(0) # Take the first preference of the first student. This is a supervisor, as it draws from the student preferences dictionary.
         
+        supervisor = student_preferences[student].pop(0) # Take the first preference of the first student. This is a supervisor, as it draws from the student preferences dictionary.    
         current_match = matches.get(supervisor) # Assign the 'current match' to a variable to check if supervisor is currently matched. Current match is a supervisor.
         # In first iteration, this is always NOT, as the matches dictionary was initiated as empty.
         
@@ -122,7 +132,9 @@ def gs_even(student_preferences, supervisor_preferences):
                 free_students.append(current_match) # As new student is preferred over current match, current match is free again and appended to free list.
             else:
                 free_students.append(student) # Vice versa of above.
-    return matches
+
+    inverted_matches = {v: k for k, v in matches.items()}  
+    return inverted_matches
 
 
 
@@ -175,7 +187,8 @@ def gs_capacity(student_preferences, supervisor_preferences, supervisor_capaciti
                     break
             proposals[student] += 1  # Move to the next preference
 
-    return matches
+    # Converting result to standard format
+    return finalize_matches(supervisor_matches)
 
 
 
@@ -233,4 +246,5 @@ def gs_uneven(student_preferences, supervisor_preferences):
                     print("Moving to the next preference.")
 
     print("Matching completed.")
-    return matches
+    # Converting result to standard format
+    return finalize_matches(supervisor_matches)

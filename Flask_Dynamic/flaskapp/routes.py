@@ -103,12 +103,13 @@ def match():
         # Clear out old matches
         Match.query.delete()
         db.session.commit()
+        db.session.commit()
 
         # Perform matching process
         matches = perform_matching()
 
         # Create new match objects for each pairing
-        for supervisor_ranking_id, student_number in matches.items():
+        for student_number, supervisor_ranking_id in matches.items():
             new_match = Match(student_number=student_number, supervisor_ranking_id=supervisor_ranking_id)
             db.session.add(new_match)
         db.session.commit()

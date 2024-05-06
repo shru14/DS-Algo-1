@@ -41,6 +41,7 @@ class Match(db.Model):
 
     def __repr__(self):
         return f"<Match(id={self.id}, Student Number={self.student_number}, Supervisor Ranking ID={self.supervisor_ranking_id})>"
+    
 
 
 #Model for storing configurations
