@@ -16,10 +16,6 @@ Folders:
 1.1.3 unequal_sets  
      Handles the allocation for limited preferences for students and professors, which means students dont rank all professors and viceversa.  
 
-2. Flask_Dynamic
-3. Flask_Frontend  
-4. Flask_Frontend_final
-
    
 
 ### **Gale–Shapley Algorithm**
