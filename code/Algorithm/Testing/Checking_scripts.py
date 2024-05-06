@@ -8,7 +8,7 @@ import os
 
 # 'Checking_scripts.py' is being run from the 'algo_stuff' directory
 sys.path.append(os.path.abspath('../../'))
-from max_spots.gs_professor_spots_better_version import gs_match_spots
+from Limited_Capacities.gs_professor_spots_better_version import gs_match_spots
 
 
 
