@@ -63,24 +63,28 @@ class StudentForm(FlaskForm):
         if self.active_config not in ['limited_capacities', 'uneven_preferences']:
             required_choices.extend([self.fourth_course_choice, self.fifth_course_choice])
 
+        #Ensuring that no input fields are empty
         if any(not choice.data for choice in required_choices):
             raise ValidationError('Please fill in all required course choices.')
 
+        #Ensuring that no course is picked twice 
         chosen_courses = [choice.data for choice in required_choices if choice.data]
         if len(chosen_courses) != len(set(chosen_courses)):
             self.first_course_choice.errors.append("Each course can only be picked once.")
             return False
 
-        # Allowed student numbers
+        #Ensuring that students input valid student number (ie no strings)
         allowed_student_numbers = ['10001', '10002', '10003', '10004', '10005']
         if self.student_number.data not in allowed_student_numbers:
             self.student_number.errors.append('Invalid student number. Please enter a valid student number')
             return False
 
+        #Ensuring that students don't submit course choice twice
         if StudentCourseChoice.query.filter_by(student_number=self.student_number.data).first():
-            self.student_number.errors.append('This student number is already registered in StudentCourseChoice.')
+            self.student_number.errors.append('A student with this student number has already submitted their course selection.')
             return False
 
+        #Ensuring that students enter the correct name + student number 
         existing_student = Student.query.filter_by(student_number=self.student_number.data).first()
         if existing_student and existing_student.name != self.name.data:
             self.student_number.errors.append("This student number is already registered under a different name. Please verify your student number.")

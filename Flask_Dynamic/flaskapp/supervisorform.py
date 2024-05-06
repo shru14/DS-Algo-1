@@ -49,35 +49,29 @@ class SupervisorForm(FlaskForm):
             if not super().validate(**kwargs):
                 return False
 
-            # Checking if any of the fields are empty
-            if not all(field.data for field in [
-                self.supervisor,
-                self.course,
-                self.first_student_choice,
-                self.second_student_choice,
-                self.third_student_choice,
-                self.fourth_student_choice,
-                self.fifth_student_choice
-            ]):
+            # Ensuring that all fields are filled
+            if not all([self.supervisor.data, self.course.data, self.first_student_choice.data,
+                        self.second_student_choice.data, self.third_student_choice.data,
+                        self.fourth_student_choice.data, self.fifth_student_choice.data]):
+                raise ValidationError("All fields must be filled out.")
 
-                raise ValidationError('Please fill in all the necessary fields.')
+            # Checking for duplicate student selections
+            student_choices = [self.first_student_choice.data, self.second_student_choice.data,
+                                self.third_student_choice.data, self.fourth_student_choice.data,
+                                self.fifth_student_choice.data]
+            if len(student_choices) != len(set(student_choices)):
+                error_msg = "Each student can only be picked once."
+                self.first_student_choice.errors.append(error_msg)
 
-            #Checking for duplicate student choices
-            chosen_students = [
-                self.first_student_choice.data,
-                self.second_student_choice.data,
-                self.third_student_choice.data,
-                self.fourth_student_choice.data,
-                self.fifth_student_choice.data
-            ]
-            if len(chosen_students) != len(set(chosen_students)):
-                self.first_student_choice.errors.append("Each student can only be picked once.")
+            # Checking for duplicate supervisors by name
+            if SupervisorStudentRanking.query.filter_by(supervisor=self.supervisor.data).first():
+                self.supervisor.errors.append("A supervisor with this name has already submitted a ranking.")
+
+            # Checking if the selected course is already assigned to a different supervisor
+            existing_assignment = SupervisorStudentRanking.query.filter_by(course=self.course.data).first()
+            if existing_assignment:
+                self.course.errors.append("This course is already assigned to another supervisor. Please select a different course.")
                 return False
 
-                # Check for existing supervisors by name
-            existing_supervisor = SupervisorStudentRanking.query.filter_by(supervisor=self.supervisor.data).first()
-            if existing_supervisor:
-                self.supervisor.errors.append("A supervisor with the same name already exists.")
-                return False
             
             return True
