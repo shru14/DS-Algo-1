@@ -3,15 +3,15 @@ from flask import render_template, flash, redirect, url_for, request
 from flask import current_app as app
 from wtforms import StringField
 from .extensions import db
-from flaskapp.models import StudentCourseChoice, SupervisorStudentRanking, Match, Configuration, Course, Student
-from flaskapp.studentform import StudentForm
-from flaskapp.supervisorform import SupervisorForm
-from flaskapp.GS import perform_matching
-from flaskapp.models import Configuration
-from flaskapp.admin import ConfigForm
+from app.models import StudentCourseChoice, SupervisorStudentRanking, Match, Configuration, Course, Student
+from app.studentform import StudentForm
+from app.supervisorform import SupervisorForm
+from app.GS import perform_matching
+from app.models import Configuration
+from app.admin import ConfigForm
 from wtforms import SelectField, StringField
-from flaskapp.init_scenario import get_active_configuration
-from flaskapp.admin import ConfigForm  
+from app.init_scenario import get_active_configuration
+from app.admin import ConfigForm  
 
 # Route for the home page, which is where the blog posts will be shown
 @app.route("/")

@@ -1,9 +1,9 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, SubmitField, SelectField
 from wtforms.validators import DataRequired, ValidationError, NumberRange, Optional
-from flaskapp.models import SupervisorStudentRanking, Student, Course
+from app.models import SupervisorStudentRanking, Student, Course
 from .extensions import db
-from flaskapp.init_scenario import get_active_configuration
+from app.init_scenario import get_active_configuration
 
 #Supervisorform 
 class SupervisorForm(FlaskForm):

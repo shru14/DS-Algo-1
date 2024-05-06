@@ -1,6 +1,6 @@
-from flaskapp.models import StudentCourseChoice, SupervisorStudentRanking, Configuration
+from app.models import StudentCourseChoice, SupervisorStudentRanking, Configuration
 from flask_sqlalchemy import SQLAlchemy
-from flaskapp.init_scenario import get_active_configuration
+from app.init_scenario import get_active_configuration
 
 #Modularized functions for easier oversights
 #fetching student preferences

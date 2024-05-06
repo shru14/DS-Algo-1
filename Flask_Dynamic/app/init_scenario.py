@@ -1,5 +1,6 @@
 from .extensions import db
-from flaskapp.models import Configuration
+from app.models import Configuration
+
 
 #Creating instance of different configurations 
 def init_configurations():
