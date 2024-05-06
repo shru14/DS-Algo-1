@@ -10,17 +10,15 @@ Folders:
     Anything that touches on the current state of dev for the inner workings for the gs algorithm.  
     Currently also holds synthetic data creation. This should move from initial "hardcoded" data to an "undefined" structure so it can take the input data frome the flaskapp.  
 1.1.1 first_iteration  
-     Includes the "naive" implementation for a random allocation.  
+     Includes the "naive" implementation for a random allocation and then handles even preferences.
 1.1.2 max_spots  
      Handles the allocation when professors have different numbers of spots available.  
 1.1.3 unequal_sets  
      Handles the allocation for limited preferences for students and professors, which means students dont rank all professors and viceversa.  
-  
-2. Flask_Frontend  
-2.1 flaskpp  
-2.1.1 static  
-2.1.2 templates  
-2.2 instance  
+
+2. Flask_Dynamic
+3. Flask_Frontend  
+4. Flask_Frontend_final
 
    
 
