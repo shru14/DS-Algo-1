@@ -103,7 +103,6 @@ def match():
         # Clear out old matches
         Match.query.delete()
         db.session.commit()
-        db.session.commit()
 
         # Perform matching process
         matches = perform_matching()
