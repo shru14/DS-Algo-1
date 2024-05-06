@@ -170,8 +170,15 @@ def admin():
         # Retrieving active configuration
         config = Configuration.query.filter_by(key='active_configuration').first()
         if not config:
-            config = Configuration(key='active_configuration')
-            db.session.add(config)
+            # Set a default active configuration if not found
+            default_config = Configuration.query.filter_by(key='even_preferences').first()
+            if default_config:
+                config = Configuration(key='active_configuration', value=default_config.value)
+                db.session.add(config)
+                db.session.commit()
+            else:
+                flash('Error: Default configuration not found.')
+                return redirect(url_for('admin'))  # Redirect to admin page with error message
 
         # Clearing relevant tables before updating the configuration
         if config.value != form.configuration.data:  # Check if configuration actually changes
